@@ -1,0 +1,51 @@
+# OS Files
+.DS_Store
+Thumbs.db
+__MACOSX/
+
+# Environment Variables & Secrets (Keep .env.example)
+.env
+*.env
+backend/.env
+frontend/.env
+!*.env.example
+
+# Golang Binaries & Build Output
+backend/api.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+backend/vendor/
+
+# Node.js & Nuxt 3 Build Artifacts
+node_modules/
+*/node_modules/
+.nuxt/
+*/.nuxt/
+.output/
+*/.output/
+.nitro/
+*/.nitro/
+dist/
+*/dist/
+
+# Template Archives & Raw Sources
+ed56duyt-sayur-template.zip
+sayur-template/
+
+# Logs & Test Scratchpad
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+*.swo
