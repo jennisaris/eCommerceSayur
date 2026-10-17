@@ -33,7 +33,14 @@ INSERT INTO categories (id, parent_id, name, slug, icon, status, description, cr
 (4, NULL, 'Teknologi, Coding & Sains', 'teknologi-sains', '/assets/images/category/category-bakery-biscuits.jpg', TRUE, 'Buku arsitektur software engineering, pemrograman praktis, kecerdasan buatan (AI), data science, dan sains modern.', NOW(), NOW()),
 (5, NULL, 'Komik, Manga & Grafis', 'komik-manga', '/assets/images/category/category-chicken-meat-fish.jpg', TRUE, 'Manga Jepang terjemahan resmi berlisensi, komik grafis nusantara, manhwa petualangan, dan serial komik best seller.', NOW(), NOW()),
 (6, NULL, 'Anak & Edukasi Pelajar', 'anak-edukasi', '/assets/images/category/category-tea-coffee-drinks.jpg', TRUE, 'Buku cerita bergambar edukatif untuk anak, ensiklopedia sains cilik, serta materi referensi belajar sekolah lengkap.', NOW(), NOW())
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  parent_id = EXCLUDED.parent_id,
+  name = EXCLUDED.name,
+  slug = EXCLUDED.slug,
+  icon = EXCLUDED.icon,
+  status = EXCLUDED.status,
+  description = EXCLUDED.description,
+  updated_at = NOW();
 
 SELECT setval('categories_id_seq', (SELECT MAX(id) FROM categories));
 
@@ -54,7 +61,21 @@ INSERT INTO products (id, category_id, parent_id, name, slug, image, description
 (7, 5, NULL, 'One Piece Vol. 100: Haoshoku (Manga Resmi Terjemahan Indonesia)', 'one-piece-vol-100-eiichiro-oda', '/images/products/product-img-7.jpg', 'Karya: Eiichiro Oda | Penerbit: Elex Media Komputindo | Halaman: 208 | Bahasa: Indonesia. Edisi spesial volume ke-100 pertempuran puncak Onigashima antara Luffy & Aliansi Topi Jerami menghadapi Yonkou Kaido.', 45000, 38000, 'buku', 190, 200, 'Tankobon Manga Bersegel Resmi', 'ACTIVE', NOW(), NOW()),
 
 (8, 6, NULL, 'Dongeng Edukasi Sains Seru untuk Anak Pintar', 'dongeng-edukasi-sains-seru-anak-pintar', '/images/products/product-img-8.jpg', 'Penulis: Tim Edukasi Cilik | Penerbit: Bhuana Ilmu Populer | Halaman: 128 | Bahasa: Indonesia Full Color. Cerita dongeng bergambar mengenalkan rahasia tata surya, hewan, tumbuhan, dan sains sehari-hari secara menyenangkan untuk anak usia 4-9 tahun.', 68000, 55000, 'buku', 260, 100, 'Buku Cerita Bergambar Full Color', 'ACTIVE', NOW(), NOW())
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  category_id = EXCLUDED.category_id,
+  parent_id = EXCLUDED.parent_id,
+  name = EXCLUDED.name,
+  slug = EXCLUDED.slug,
+  image = EXCLUDED.image,
+  description = EXCLUDED.description,
+  regular_price = EXCLUDED.regular_price,
+  sale_price = EXCLUDED.sale_price,
+  unit = EXCLUDED.unit,
+  weight = EXCLUDED.weight,
+  stock = EXCLUDED.stock,
+  variant_name = EXCLUDED.variant_name,
+  status = EXCLUDED.status,
+  updated_at = NOW();
 
 SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));
 
