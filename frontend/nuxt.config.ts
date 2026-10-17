@@ -1,7 +1,28 @@
+import dns from 'node:dns'
+
+// Force IPv4 first to prevent IPv6 ::1 loopback mismatch (426 Upgrade Required)
+dns.setDefaultResultOrder('ipv4first')
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-10-01',
   devtools: { enabled: false },
+  devServer: {
+    host: '127.0.0.1',
+    port: 3000,
+  },
+  vite: {
+    server: {
+      host: '127.0.0.1',
+      strictPort: true,
+      hmr: {
+        protocol: 'ws',
+        host: '127.0.0.1',
+        port: 3000,
+        clientPort: 3000,
+      },
+    },
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',

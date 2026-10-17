@@ -9,13 +9,15 @@ import (
 )
 
 type Config struct {
-	AppEnv   string
-	AppPort  string
-	Database DatabaseConfig
-	Redis    RedisConfig
-	JWT      JWTConfig
-	Midtrans MidtransConfig
-	Client   ClientConfig
+	AppEnv             string
+	AppPort            string
+	Database           DatabaseConfig
+	Redis              RedisConfig
+	JWT                JWTConfig
+	Midtrans           MidtransConfig
+	Client             ClientConfig
+	CORSAllowedOrigins string
+	RunSeeder          bool
 }
 
 type DatabaseConfig struct {
@@ -61,15 +63,39 @@ func LoadConfig() (*Config, error) {
 	// Try loading .env file (ignore error if not found in production)
 	_ = godotenv.Load()
 
+	appEnv := getEnv("APP_ENV", "development")
 	jwtHours, err := strconv.Atoi(getEnv("JWT_EXPIRATION_HOURS", "72"))
 	if err != nil {
 		jwtHours = 72
 	}
 
+	jwtSecret := getEnv("JWT_SECRET", "super-secret-ecommerce-jwt-token-key-2026")
+	if appEnv == "production" {
+		if jwtSecret == "super-secret-ecommerce-jwt-token-key-2026" || len(jwtSecret) < 32 {
+			return nil, fmt.Errorf("FATAL SECURITY: Insecure default or short JWT_SECRET detected in production mode. Set a random secret of at least 32 characters in .env")
+		}
+	}
+
 	isProduction := getEnv("MIDTRANS_IS_PRODUCTION", "false") == "true"
 
+	// Seeder configuration: enabled by default in development, disabled by default in production
+	runSeeder := appEnv != "production"
+	if customSeeder, ok := os.LookupEnv("RUN_SEEDER"); ok {
+		runSeeder = customSeeder == "true" || customSeeder == "1"
+	}
+
+	clientBaseURL := getEnv("CLIENT_BASE_URL", "http://localhost:3000")
+	corsOrigins := getEnv("CORS_ALLOWED_ORIGINS", "")
+	if corsOrigins == "" {
+		if appEnv == "production" {
+			corsOrigins = clientBaseURL
+		} else {
+			corsOrigins = fmt.Sprintf("%s,http://localhost:3000,http://127.0.0.1:3000", clientBaseURL)
+		}
+	}
+
 	return &Config{
-		AppEnv:  getEnv("APP_ENV", "development"),
+		AppEnv:  appEnv,
 		AppPort: getEnv("APP_PORT", "8080"),
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
@@ -85,7 +111,7 @@ func LoadConfig() (*Config, error) {
 			Password: getEnv("REDIS_PASSWORD", ""),
 		},
 		JWT: JWTConfig{
-			Secret:          getEnv("JWT_SECRET", "super-secret-ecommerce-jwt-token-key-2026"),
+			Secret:          jwtSecret,
 			ExpirationHours: jwtHours,
 		},
 		Midtrans: MidtransConfig{
@@ -94,8 +120,10 @@ func LoadConfig() (*Config, error) {
 			IsProduction: isProduction,
 		},
 		Client: ClientConfig{
-			BaseURL: getEnv("CLIENT_BASE_URL", "http://localhost:3000"),
+			BaseURL: clientBaseURL,
 		},
+		CORSAllowedOrigins: corsOrigins,
+		RunSeeder:          runSeeder,
 	}, nil
 }
 

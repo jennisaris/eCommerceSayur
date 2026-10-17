@@ -5,6 +5,7 @@ import (
 	"ecommerce-backend/internal/pkg/response"
 	"errors"
 	"log"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,6 +23,21 @@ func NewPaymentHandler(paymentUseCase domain.PaymentUseCase) *PaymentHandler {
 func (h *PaymentHandler) CreateSnapToken(c *fiber.Ctx) error {
 	userID := c.Locals("user_id").(int64)
 	orderCode := c.Params("order_code")
+	if orderCode == "" {
+		wildcard := c.Params("*")
+		orderCode = strings.TrimSuffix(wildcard, "/snap")
+		orderCode = strings.TrimPrefix(orderCode, "/")
+	}
+	if orderCode == "" {
+		orderCode = c.Query("order_code")
+	}
+	if orderCode == "" {
+		var req struct {
+			OrderCode string `json:"order_code"`
+		}
+		_ = c.BodyParser(&req)
+		orderCode = req.OrderCode
+	}
 
 	res, err := h.paymentUseCase.CreateSnapTransaction(c.Context(), orderCode, userID)
 	if err != nil {

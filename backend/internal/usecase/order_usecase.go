@@ -38,9 +38,9 @@ func NewOrderUseCase(
 	}
 }
 
-// calculateShipping calculates dynamic delivery fee based on weight (100% Delivery Model)
+// CalculateShippingFee calculates dynamic delivery fee based on weight (100% Delivery Model)
 // Base fee: Rp 15.000 for first 1,000 grams, Rp 8.000 per additional kg
-func (u *OrderUseCase) calculateShipping(totalWeightGrams int) int64 {
+func CalculateShippingFee(totalWeightGrams int) int64 {
 	baseFee := int64(15000)
 	if totalWeightGrams <= 1000 {
 		return baseFee
@@ -51,12 +51,16 @@ func (u *OrderUseCase) calculateShipping(totalWeightGrams int) int64 {
 	return baseFee + (int64(additionalKg) * 8000)
 }
 
+func (u *OrderUseCase) calculateShipping(totalWeightGrams int) int64 {
+	return CalculateShippingFee(totalWeightGrams)
+}
+
 func (u *OrderUseCase) generateOrderCode() string {
 	datePart := time.Now().Format("20060102")
 	randomBytes := make([]byte, 3)
 	_, _ = rand.Read(randomBytes)
 	suffix := strings.ToUpper(hex.EncodeToString(randomBytes))
-	return fmt.Sprintf("INV/%s/%s", datePart, suffix)
+	return fmt.Sprintf("INV-%s-%s", datePart, suffix)
 }
 
 func (u *OrderUseCase) EstimateCheckout(ctx context.Context, userID int64, req *domain.CheckoutEstimateRequest) (*domain.CheckoutEstimateResponse, error) {

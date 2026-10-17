@@ -4,9 +4,12 @@ import (
 	"ecommerce-backend/internal/delivery/http/handler"
 	"ecommerce-backend/internal/delivery/http/middleware"
 	"ecommerce-backend/internal/pkg/jwt"
+	"ecommerce-backend/internal/pkg/response"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
@@ -20,6 +23,7 @@ type RouterConfig struct {
 	PaymentHandler    *handler.PaymentHandler
 	AdminOrderHandler *handler.AdminOrderHandler
 	JWTService        *jwt.JWTService
+	AllowedOrigins    string
 }
 
 func SetupRoutes(app *fiber.App, cfg *RouterConfig) {
@@ -28,14 +32,57 @@ func SetupRoutes(app *fiber.App, cfg *RouterConfig) {
 	app.Use(logger.New(logger.Config{
 		Format: "[${time}] ${status} - ${latency} ${method} ${path}\n",
 	}))
+
+	allowedOrigins := cfg.AllowedOrigins
+	if allowedOrigins == "" {
+		allowedOrigins = "http://localhost:3000,http://127.0.0.1:3000"
+	}
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "*",
+		AllowOrigins:     allowedOrigins,
 		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
 		AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With",
-		AllowCredentials: false,
+		AllowCredentials: true,
 	}))
 
-	// Liveness & Readiness Probe
+	// Security Rate Limiters
+	// 1. Auth Limiter: 10 attempts per minute per IP to protect from brute-force & credential stuffing
+	authLimiter := limiter.New(limiter.Config{
+		Max:        10,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: func(c *fiber.Ctx) string {
+			return c.IP()
+		},
+		LimitReached: func(c *fiber.Ctx) error {
+			return response.Error(c, fiber.StatusTooManyRequests, "Terlalu banyak percobaan autentikasi. Silakan tunggu 1 menit.")
+		},
+	})
+
+	// 2. Order Checkout Limiter: 30 attempts per minute per IP
+	orderLimiter := limiter.New(limiter.Config{
+		Max:        30,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: func(c *fiber.Ctx) string {
+			return c.IP()
+		},
+		LimitReached: func(c *fiber.Ctx) error {
+			return response.Error(c, fiber.StatusTooManyRequests, "Terlalu banyak permintaan pemesanan. Silakan tunggu sesaat.")
+		},
+	})
+
+	// Root Welcome & Health Check Routes
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"service":    "Enterprise eCommerce Platform API (Sayur FreshCart)",
+			"status":     "online",
+			"version":    "v1.0.0",
+			"frontend":   "http://127.0.0.1:3000",
+			"health":     "/health",
+			"api_v1":     "/api/v1",
+			"message":    "Backend API aktif. Untuk antarmuka web toko pelanggan & admin, silakan buka http://127.0.0.1:3000",
+		})
+	})
+
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status":  "healthy",
@@ -44,14 +91,29 @@ func SetupRoutes(app *fiber.App, cfg *RouterConfig) {
 	})
 
 	api := app.Group("/api/v1")
+	api.Get("/", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"service": "Sayur FreshCart REST API v1",
+			"status":  "running",
+			"endpoints": fiber.Map{
+				"health":     "/health",
+				"auth":       "/api/v1/auth",
+				"categories": "/api/v1/categories",
+				"products":   "/api/v1/products",
+				"cart":       "/api/v1/cart",
+				"orders":     "/api/v1/orders",
+				"payments":   "/api/v1/payments",
+			},
+		})
+	})
 
 	// ==========================================
 	// PUBLIC ROUTES
 	// ==========================================
-	// Auth
+	// Auth (Protected with Rate Limiter)
 	auth := api.Group("/auth")
-	auth.Post("/register", cfg.AuthHandler.Register)
-	auth.Post("/login", cfg.AuthHandler.Login)
+	auth.Post("/register", authLimiter, cfg.AuthHandler.Register)
+	auth.Post("/login", authLimiter, cfg.AuthHandler.Login)
 
 	// Catalog (Public, Cache-Accelerated)
 	api.Get("/categories", cfg.CategoryHandler.GetAll)
@@ -81,13 +143,16 @@ func SetupRoutes(app *fiber.App, cfg *RouterConfig) {
 	// Checkout & Orders (100% Delivery Model)
 	orders := api.Group("/orders", userAuth)
 	orders.Post("/estimate", cfg.OrderHandler.EstimateCheckout)
-	orders.Post("/", cfg.OrderHandler.CreateOrder)
-	orders.Post("/checkout", cfg.OrderHandler.CreateOrder)
+	orders.Post("/", orderLimiter, cfg.OrderHandler.CreateOrder)
+	orders.Post("/checkout", orderLimiter, cfg.OrderHandler.CreateOrder)
 	orders.Get("/", cfg.OrderHandler.GetUserOrders)
 	orders.Get("/:code", cfg.OrderHandler.GetOrderByCode)
+	orders.Get("/*", cfg.OrderHandler.GetOrderByCode)
 
 	// Payments
+	api.Post("/payments/snap", userAuth, cfg.PaymentHandler.CreateSnapToken)
 	api.Post("/payments/:order_code/snap", userAuth, cfg.PaymentHandler.CreateSnapToken)
+	api.Post("/payments/*", userAuth, cfg.PaymentHandler.CreateSnapToken)
 
 	// ==========================================
 	// SUPER ADMIN ROUTES (RBAC Protected)

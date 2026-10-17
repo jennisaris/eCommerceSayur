@@ -144,7 +144,8 @@ const calculateItemsSubtotal = computed(() => {
 })
 
 const fetchOrder = async () => {
-  const code = route.params.code as string
+  const rawCode = route.params.code
+  const code = Array.isArray(rawCode) ? rawCode.join('/') : (rawCode as string)
   isLoading.value = true
   try {
     const res = await api.get<Order>(`/orders/${code}`)
@@ -161,7 +162,8 @@ const handlePayNow = async () => {
   isPaying.value = true
   try {
     const snapRes = await api.post<{ snap_token: string; redirect_url: string }>(
-      `/payments/${order.value.order_code}/snap`
+      '/payments/snap',
+      { order_code: order.value.order_code }
     )
     const snapToken = snapRes.data?.snap_token
 

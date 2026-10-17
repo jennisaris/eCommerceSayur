@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"ecommerce-backend/internal/domain"
 	"ecommerce-backend/internal/pkg/midtrans"
@@ -49,6 +50,24 @@ func (u *PaymentUseCase) CreateSnapTransaction(ctx context.Context, orderCode st
 		return nil, fmt.Errorf("order cannot be paid in current status (%s): %w", order.Status, domain.ErrInvalidOrderState)
 	}
 
+	// 1. If Snap transaction was already initiated for this order, reuse the existing Snap Token
+	existingPayment, _ := u.paymentRepo.GetByOrderID(ctx, order.ID)
+	if existingPayment != nil && existingPayment.PaymentURL != "" {
+		token := existingPayment.SnapToken
+		if token == "" {
+			parts := strings.Split(existingPayment.PaymentURL, "/")
+			if len(parts) > 0 {
+				token = parts[len(parts)-1]
+			}
+		}
+		if token != "" {
+			return &domain.CreateSnapTransactionResponse{
+				SnapToken:   token,
+				RedirectURL: existingPayment.PaymentURL,
+			}, nil
+		}
+	}
+
 	buyer, _ := u.userRepo.GetByID(ctx, userID)
 
 	// Prepare item details for Snap popup
@@ -78,9 +97,10 @@ func (u *PaymentUseCase) CreateSnapTransaction(ctx context.Context, orderCode st
 		customerEmail = buyer.Email
 	}
 
+	midtransOrderID := strings.ReplaceAll(order.OrderCode, "/", "-")
 	snapReq := &midtrans.CreateSnapRequest{
 		TransactionDetails: midtrans.SnapTransactionDetails{
-			OrderID:     order.OrderCode,
+			OrderID:     midtransOrderID,
 			GrossAmount: order.TotalAmount,
 		},
 		CustomerDetails: midtrans.SnapCustomerDetails{
@@ -97,6 +117,11 @@ func (u *PaymentUseCase) CreateSnapTransaction(ctx context.Context, orderCode st
 	}
 
 	snapResp, err := u.midtransSvc.CreateSnapTransaction(snapReq)
+	// If order_id was already taken in Midtrans, retry with unique suffix
+	if err != nil && strings.Contains(err.Error(), "has already been taken") {
+		snapReq.TransactionDetails.OrderID = fmt.Sprintf("%s-%d", midtransOrderID, time.Now().Unix()%100000)
+		snapResp, err = u.midtransSvc.CreateSnapTransaction(snapReq)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate snap transaction: %w", err)
 	}
@@ -141,6 +166,27 @@ func (u *PaymentUseCase) HandleMidtransCallback(ctx context.Context, payload []b
 	// 2. Find order
 	order, err := u.orderRepo.GetByCode(ctx, webhook.OrderID)
 	if err != nil {
+		// Fallback 1: for orders created with slashes
+		legacyCode := strings.Replace(webhook.OrderID, "-", "/", 2)
+		if legacyOrder, errLegacy := u.orderRepo.GetByCode(ctx, legacyCode); errLegacy == nil {
+			order = legacyOrder
+		} else {
+			// Fallback 2: if order_id has retry suffix like INV-20261017-0AC535-12345
+			parts := strings.Split(webhook.OrderID, "-")
+			if len(parts) >= 4 {
+				baseCode := strings.Join(parts[:3], "-")
+				if o, errBase := u.orderRepo.GetByCode(ctx, baseCode); errBase == nil {
+					order = o
+				} else {
+					baseSlash := strings.Join(parts[:3], "/")
+					if o2, errSlash := u.orderRepo.GetByCode(ctx, baseSlash); errSlash == nil {
+						order = o2
+					}
+				}
+			}
+		}
+	}
+	if order == nil {
 		return fmt.Errorf("order not found for code %s: %w", webhook.OrderID, err)
 	}
 

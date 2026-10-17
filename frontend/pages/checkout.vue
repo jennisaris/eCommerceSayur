@@ -263,7 +263,8 @@ const handleCheckout = async () => {
 
     // 2. Request Midtrans Snap Token
     const snapRes = await api.post<{ snap_token: string; redirect_url: string }>(
-      `/payments/${createdOrder.order_code}/snap`
+      '/payments/snap',
+      { order_code: createdOrder.order_code }
     )
 
     const snapToken = snapRes.data?.snap_token

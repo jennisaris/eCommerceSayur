@@ -40,7 +40,7 @@ func main() {
 	if _, err := os.Stat(migrationsDir); os.IsNotExist(err) {
 		migrationsDir = filepath.Join(".", "migrations")
 	}
-	if err := postgresrepo.RunMigrations(db, migrationsDir); err != nil {
+	if err := postgresrepo.RunMigrations(db, migrationsDir, cfg.RunSeeder); err != nil {
 		log.Printf("⚠️ Migration warning: %v", err)
 	}
 
@@ -109,6 +109,7 @@ func main() {
 		PaymentHandler:    paymentHandler,
 		AdminOrderHandler: adminOrderHandler,
 		JWTService:        jwtSvc,
+		AllowedOrigins:    cfg.CORSAllowedOrigins,
 	})
 
 	// 11. Graceful Shutdown Handler

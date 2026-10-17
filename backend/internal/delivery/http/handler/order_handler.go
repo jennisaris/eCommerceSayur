@@ -5,6 +5,7 @@ import (
 	"ecommerce-backend/internal/pkg/response"
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -91,6 +92,9 @@ func (h *OrderHandler) GetUserOrders(c *fiber.Ctx) error {
 func (h *OrderHandler) GetOrderByCode(c *fiber.Ctx) error {
 	userID := c.Locals("user_id").(int64)
 	code := c.Params("code")
+	if code == "" {
+		code = strings.TrimPrefix(c.Params("*"), "/")
+	}
 
 	// Check if user is Super Admin
 	isAdmin := false

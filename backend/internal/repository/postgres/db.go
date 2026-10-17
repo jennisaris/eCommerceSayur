@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -41,7 +42,7 @@ func NewDB(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 }
 
 // RunMigrations executes up SQL migration files from the given directory
-func RunMigrations(db *gorm.DB, migrationsDir string) error {
+func RunMigrations(db *gorm.DB, migrationsDir string, runSeeder bool) error {
 	entries, err := os.ReadDir(migrationsDir)
 	if err != nil {
 		// Log and continue if dir not found (e.g. running in testing container where initdb ran it)
@@ -51,6 +52,12 @@ func RunMigrations(db *gorm.DB, migrationsDir string) error {
 
 	for _, entry := range entries {
 		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".sql" && len(entry.Name()) > 7 && entry.Name()[len(entry.Name())-7:] == ".up.sql" {
+			// In production, skip seeder files unless explicitly enabled
+			if !runSeeder && strings.Contains(strings.ToLower(entry.Name()), "seed") {
+				log.Printf("ℹ️ Skipping seed data migration in production mode: %s", entry.Name())
+				continue
+			}
+
 			filePath := filepath.Join(migrationsDir, entry.Name())
 			content, err := os.ReadFile(filePath)
 			if err != nil {
