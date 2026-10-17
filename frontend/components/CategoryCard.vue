@@ -1,13 +1,11 @@
 <template>
   <NuxtLink :to="`/products?category_id=${category.id}`" class="block">
-    <div class="relative rounded-lg break-words border bg-white border-gray-300 transition duration-75 hover:transition hover:duration-500 ease-in-out hover:border-green-600 hover:shadow-md p-3 text-center group h-full flex flex-col justify-center items-center">
+    <div class="relative rounded-xl break-words border bg-white border-gray-200 transition duration-150 hover:duration-300 ease-in-out hover:border-indigo-600 hover:shadow-md p-3 text-center group h-full flex flex-col justify-center items-center">
       <div class="py-3 text-center flex flex-col items-center">
-        <img
-          :src="category.icon || '/assets/images/category/category-dairy-bread-eggs.jpg'"
-          :alt="category.name"
-          class="mb-3 mx-auto w-20 h-20 object-contain group-hover:scale-105 transition-transform duration-300"
-        />
-        <div class="text-xs sm:text-sm font-semibold text-gray-800 group-hover:text-green-600 transition-colors line-clamp-1">
+        <div class="w-16 h-16 rounded-xl bg-indigo-50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+          <i class="ti ti-books text-2xl text-indigo-600"></i>
+        </div>
+        <div class="text-xs sm:text-sm font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors line-clamp-1">
           {{ category.name }}
         </div>
       </div>

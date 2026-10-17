@@ -91,8 +91,8 @@ func main() {
 
 	// 9. Initialize Fiber Web Application
 	app := fiber.New(fiber.Config{
-		AppName:               "Enterprise eCommerce Platform API",
-		ServerHeader:          "Fiber-Go-CleanArch",
+		AppName:               "BookVerse - Enterprise BookStore Platform API",
+		ServerHeader:          "BookVerse-Go-CleanArch",
 		BodyLimit:             10 * 1024 * 1024, // 10MB
 		ReadBufferSize:        8192,
 		WriteBufferSize:       8192,

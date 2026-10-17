@@ -2,33 +2,33 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-2 text-xs text-gray-500 mb-6">
-      <NuxtLink to="/" class="hover:text-green-600 flex items-center gap-1">
+      <NuxtLink to="/" class="hover:text-indigo-600 flex items-center gap-1">
         <i class="ti ti-home text-sm"></i>
         <span>Home</span>
       </NuxtLink>
       <span>/</span>
-      <NuxtLink to="/cart" class="hover:text-green-600">Cart</NuxtLink>
+      <NuxtLink to="/cart" class="hover:text-indigo-600">Keranjang</NuxtLink>
       <span>/</span>
-      <span class="text-gray-800 font-semibold">Checkout</span>
+      <span class="text-gray-800 font-semibold">Checkout Buku</span>
     </nav>
 
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Checkout & Pengiriman</h1>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Checkout & Pengiriman Buku</h1>
       <p class="text-xs sm:text-sm text-gray-500 mt-1">
-        Lengkapi detail alamat pengiriman Anda (100% Home Delivery Model) dan bayar aman dengan Midtrans Snap.
+        Lengkapi detail alamat pengiriman buku Anda dengan proteksi kemasan kardus sudut & bubble wrap tebal, bayar praktis via Midtrans Snap.
       </p>
     </div>
 
     <!-- Empty cart state -->
     <div v-if="cartStore.items.length === 0" class="text-center py-20 bg-white rounded-2xl border border-gray-200 p-8">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-        <i class="ti ti-shopping-cart-off text-3xl"></i>
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+        <i class="ti ti-book-off text-3xl"></i>
       </div>
       <h3 class="text-base font-bold text-gray-800">Keranjang belanja Anda kosong</h3>
-      <p class="text-xs text-gray-500 mt-1">Silakan pilih produk terlebih dahulu sebelum melakukan checkout.</p>
-      <NuxtLink to="/products" class="mt-4 inline-block px-5 py-2.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 shadow-xs transition-all">
-        Kembali ke Katalog
+      <p class="text-xs text-gray-500 mt-1">Silakan pilih buku terlebih dahulu sebelum melakukan checkout.</p>
+      <NuxtLink to="/products" class="mt-4 inline-block px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-xs transition-all">
+        Kembali ke Katalog Buku
       </NuxtLink>
     </div>
 
@@ -36,15 +36,15 @@
     <form v-else @submit.prevent="handleCheckout" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
       <!-- Left Column: Delivery Form -->
       <div class="lg:col-span-2 space-y-6">
-        <!-- 100% Delivery Notice Card -->
-        <div class="p-4 rounded-xl bg-green-50 border border-green-200 flex items-start gap-3.5">
-          <div class="w-10 h-10 rounded-lg bg-green-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
-            <i class="ti ti-truck-delivery text-xl"></i>
+        <!-- Packaging & Delivery Protection Card -->
+        <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200 flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+            <i class="ti ti-shield-check text-xl"></i>
           </div>
           <div class="text-xs">
-            <div class="font-bold text-green-950 text-sm">Kebijakan 100% Home Delivery Model</div>
-            <p class="text-green-800 mt-0.5 leading-relaxed">
-              Toko beroperasi 24 Jam Non-Stop. Semua pesanan sayuran dan bahan dapur langsung diantar oleh kurir ke alamat Anda (tidak tersedia opsi pickup toko).
+            <div class="font-bold text-indigo-950 text-sm">Standar Pengiriman Buku Anti-Tekuk</div>
+            <p class="text-indigo-800 mt-0.5 leading-relaxed">
+              Setiap buku dikemas rapat dengan lapisan double bubble wrap serta pelindung karton tebal di setiap sudut, memastikan buku sampai dalam kondisi 100% mulus dan sempurna.
             </p>
           </div>
         </div>
@@ -52,7 +52,7 @@
         <!-- Form Card: Delivery Details -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-xs space-y-5">
           <h2 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
-            <i class="ti ti-map-pin text-green-600 text-lg"></i>
+            <i class="ti ti-map-pin text-indigo-600 text-lg"></i>
             <span>Data Penerima & Alamat Pengiriman</span>
           </h2>
 
@@ -66,7 +66,7 @@
                 type="text"
                 required
                 placeholder="Contoh: Budi Santoso"
-                class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+                class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
             </div>
 
@@ -79,7 +79,7 @@
                 type="tel"
                 required
                 placeholder="Contoh: 081234567890"
-                class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+                class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
             </div>
           </div>
@@ -92,8 +92,8 @@
               v-model="form.shipping_address"
               required
               rows="3"
-              placeholder="Sebutkan nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota, dan patokan tujuan..."
-              class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+              placeholder="Sebutkan nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota, kode pos, dan patokan tujuan..."
+              class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
             ></textarea>
           </div>
 
@@ -105,7 +105,7 @@
               v-model="form.remarks"
               type="text"
               placeholder="Contoh: Titip di pos sekuriti jika gerbang terkunci"
-              class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+              class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
             />
           </div>
         </div>
@@ -113,12 +113,12 @@
         <!-- Payment Gateway Selection Info -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-xs space-y-4">
           <h2 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
-            <i class="ti ti-credit-card text-green-600 text-lg"></i>
+            <i class="ti ti-credit-card text-indigo-600 text-lg"></i>
             <span>Metode Pembayaran (Midtrans Snap)</span>
           </h2>
           <div class="p-4 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <i class="ti ti-shield-lock text-2xl text-green-600"></i>
+              <i class="ti ti-shield-lock text-2xl text-indigo-600"></i>
               <div class="text-xs">
                 <div class="font-bold text-gray-900">Midtrans Pop-up Snap Gateway</div>
                 <div class="text-gray-500">QRIS, BCA, Mandiri, BNI, BRI Virtual Account, dan Kartu Kredit</div>
@@ -132,11 +132,11 @@
         </div>
       </div>
 
-      <!-- Right Column: Order Details Summary (FreshCart Template Style) -->
+      <!-- Right Column: Order Details Summary -->
       <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-xs space-y-6 sticky top-24">
         <h3 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center justify-between">
-          <span>Order Details</span>
-          <span class="text-xs font-normal text-gray-500">{{ cartStore.totalItems }} Items</span>
+          <span>Detail Pesanan</span>
+          <span class="text-xs font-normal text-gray-500">{{ cartStore.totalItems }} Buku</span>
         </h3>
 
         <!-- Purchased items list -->
@@ -150,7 +150,7 @@
               <img
                 :src="item.product?.image || '/assets/images/products/product-img-1.jpg'"
                 alt="Product"
-                class="w-10 h-10 object-contain rounded-md bg-gray-50 border border-gray-200 flex-shrink-0"
+                class="w-10 h-14 object-cover rounded-md bg-gray-50 border border-gray-200 flex-shrink-0"
               />
               <div class="min-w-0">
                 <div class="font-semibold text-gray-900 truncate max-w-[140px]">
@@ -170,7 +170,7 @@
         <!-- Cost Breakdown -->
         <div class="space-y-2.5 text-xs pt-4 border-t border-gray-100">
           <div class="flex justify-between text-gray-600">
-            <span>Subtotal Produk</span>
+            <span>Subtotal Buku</span>
             <span class="font-semibold text-gray-900">{{ formatIDR(cartStore.totalPrice) }}</span>
           </div>
           <div class="flex justify-between text-gray-600">
@@ -178,12 +178,12 @@
             <span class="font-semibold text-gray-900">{{ (cartStore.totalWeight / 1000).toFixed(2) }} kg</span>
           </div>
           <div class="flex justify-between text-gray-600">
-            <span>Ongkos Kirim (100% Delivery)</span>
-            <span class="font-semibold text-green-600">{{ formatIDR(shippingFee) }}</span>
+            <span>Ongkos Kirim Kurir</span>
+            <span class="font-semibold text-indigo-600">{{ formatIDR(shippingFee) }}</span>
           </div>
           <div class="flex justify-between pt-3 border-t border-gray-200 text-sm">
             <span class="font-extrabold text-gray-900">Total Tagihan</span>
-            <span class="text-base font-extrabold text-green-600">{{ formatIDR(totalBill) }}</span>
+            <span class="text-base font-extrabold text-indigo-600">{{ formatIDR(totalBill) }}</span>
           </div>
         </div>
 
@@ -191,7 +191,7 @@
         <button
           :disabled="isSubmitting || cartStore.items.length === 0"
           type="submit"
-          class="w-full py-3.5 px-4 bg-green-600 hover:bg-green-700 text-white font-bold text-sm rounded-xl shadow-md shadow-green-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+          class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
         >
           <i v-if="isSubmitting" class="ti ti-loader-2 animate-spin text-base"></i>
           <span v-else class="flex items-center gap-1.5">
@@ -202,7 +202,7 @@
 
         <!-- Security guarantee footer -->
         <div class="flex items-center justify-center gap-1.5 text-[11px] text-gray-400">
-          <i class="ti ti-shield-check text-green-600 text-sm"></i>
+          <i class="ti ti-shield-check text-indigo-600 text-sm"></i>
           <span>Enkripsi SSL 256-Bit & Idempoten Midtrans</span>
         </div>
       </div>

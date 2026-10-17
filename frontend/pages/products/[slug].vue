@@ -35,58 +35,57 @@
 
     <!-- FreshCart Shop Single View -->
     <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-      <!-- Product Image Display -->
-      <div class="sticky top-24 bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex items-center justify-center">
-        <div class="relative w-full aspect-square flex items-center justify-center overflow-hidden">
+      <!-- Book Cover Image Display -->
+      <div class="sticky top-24 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-center">
+        <div class="relative w-full aspect-[3/4] max-w-sm flex items-center justify-center overflow-hidden rounded-2xl bg-slate-50 p-2 shadow-inner">
           <img
-            :src="product.image || '/assets/images/products/product-single-img-1.jpg'"
+            :src="product.image || '/images/products/book-atomic-habits.jpg'"
             :alt="product.name"
-            class="max-w-full max-h-[420px] object-contain hover:scale-105 transition-transform duration-300"
+            class="max-w-full max-h-[460px] object-cover rounded-xl shadow-md hover:scale-105 transition-transform duration-300"
           />
-          <div v-if="hasDiscount" class="absolute top-2 left-2 z-10">
-            <span class="inline-block px-2.5 py-1 text-xs font-bold rounded bg-red-600 text-white">
-              -{{ discountPercentage }}% Off
+          <div v-if="hasDiscount" class="absolute top-4 left-4 z-10">
+            <span class="inline-block px-3 py-1 text-xs font-extrabold rounded-lg bg-rose-600 text-white shadow-sm">
+              Hemat {{ discountPercentage }}%
             </span>
           </div>
         </div>
       </div>
 
-      <!-- Product Purchase Options & Details -->
+      <!-- Book Purchase Options & Details -->
       <div class="space-y-6">
         <div>
-          <span class="text-xs font-bold text-green-600 uppercase tracking-wider mb-2 inline-block">
-            {{ product.category?.name || 'Sayur & Bahan Makanan' }}
+          <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 inline-block">
+            {{ product.category?.name || 'Katalog Buku' }}
           </span>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-snug">
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug">
             {{ product.name }}
           </h1>
 
-          <!-- Ratings from FreshCart template -->
           <div class="flex items-center gap-2 mt-2 text-xs">
-            <div class="flex items-center text-yellow-500">
+            <div class="flex items-center text-amber-500">
               <i class="ti ti-star-filled"></i>
               <i class="ti ti-star-filled"></i>
               <i class="ti ti-star-filled"></i>
               <i class="ti ti-star-filled"></i>
               <i class="ti ti-star-half-filled"></i>
             </div>
-            <span class="text-green-600 font-bold">(32 reviews)</span>
-            <span class="text-gray-300">&bull;</span>
-            <span :class="product.stock > 0 ? 'text-green-600 font-bold' : 'text-red-500 font-bold'">
-              {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
+            <span class="text-indigo-600 font-bold">(48 ulasan pembaca)</span>
+            <span class="text-slate-300">&bull;</span>
+            <span :class="product.stock > 0 ? 'text-emerald-600 font-bold' : 'text-rose-500 font-bold'">
+              {{ product.stock > 0 ? 'Tersedia (Ready Stock)' : 'Stok Habis' }}
             </span>
           </div>
         </div>
 
         <!-- Pricing Section -->
-        <div class="p-5 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
+        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
           <div>
-            <div class="text-2xl sm:text-3xl font-black text-gray-900">
+            <div class="text-2xl sm:text-3xl font-black text-slate-900">
               {{ formatIDR(effectivePrice) }}
             </div>
             <div v-if="hasDiscount" class="flex items-center gap-2 mt-1">
-              <span class="text-xs text-gray-400 line-through">{{ formatIDR(product.regular_price) }}</span>
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-700">
+              <span class="text-xs text-slate-400 line-through">{{ formatIDR(product.regular_price) }}</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-100 text-rose-700">
                 Hemat {{ discountPercentage }}%
               </span>
             </div>
@@ -94,32 +93,32 @@
 
           <div class="text-right">
             <span
-              :class="product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+              :class="product.stock > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'"
               class="inline-block px-3 py-1 text-xs font-bold rounded-full"
             >
               {{ product.stock > 0 ? `Tersedia: ${product.stock} ${product.unit}` : 'Stok Habis' }}
             </span>
-            <div class="text-[11px] text-gray-500 mt-1">Berat: {{ product.weight }} gram</div>
+            <div class="text-[11px] text-slate-500 mt-1 font-medium">Bobot Buku: {{ product.weight }} gram</div>
           </div>
         </div>
 
-        <!-- Description -->
+        <!-- Book Synopsis & Description -->
         <div>
-          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Deskripsi Produk</h3>
-          <p class="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-            {{ product.description || 'Produk sayuran segar pilihan terbaik, dipetik langsung dari kebun mitra terpercaya dengan standar kebersihan tinggi.' }}
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Sinopsis & Keterangan Buku</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-slate-200/80">
+            {{ product.description || 'Buku pilihan original berkualitas tinggi langsung dari penerbit resmi dengan jaminan isi lengkap dan segel pabrik.' }}
           </p>
         </div>
 
         <!-- Quantity & Add to Cart Controls -->
-        <div class="space-y-4 pt-2 border-t border-gray-200">
+        <div class="space-y-4 pt-2 border-t border-slate-200">
           <div class="flex items-center gap-4">
-            <span class="text-xs font-bold text-gray-700">Jumlah Beli:</span>
-            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+            <span class="text-xs font-bold text-slate-700">Jumlah Eksemplar:</span>
+            <div class="flex items-center border border-slate-300 rounded-xl overflow-hidden bg-white shadow-xs">
               <button
                 @click="qty = Math.max(1, qty - 1)"
                 :disabled="qty <= 1"
-                class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition-colors border-r border-gray-200"
+                class="px-3.5 py-1.5 text-xs text-slate-600 hover:bg-slate-100 disabled:opacity-40 transition-colors border-r border-slate-200"
               >
                 -
               </button>
@@ -128,17 +127,17 @@
                 type="number"
                 min="1"
                 :max="product.stock"
-                class="w-12 text-center text-xs font-bold text-gray-900 focus:outline-none"
+                class="w-12 text-center text-xs font-bold text-slate-900 focus:outline-none"
               />
               <button
                 @click="qty = Math.min(product.stock, qty + 1)"
                 :disabled="qty >= product.stock"
-                class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition-colors border-l border-gray-200"
+                class="px-3.5 py-1.5 text-xs text-slate-600 hover:bg-slate-100 disabled:opacity-40 transition-colors border-l border-slate-200"
               >
                 +
               </button>
             </div>
-            <span class="text-xs text-gray-500">Maks. {{ product.stock }} unit</span>
+            <span class="text-xs text-slate-500">Maks. {{ product.stock }} eksemplar</span>
           </div>
 
           <div class="flex flex-col sm:flex-row gap-3 pt-2">
@@ -146,10 +145,10 @@
               @click="handleAddToCart"
               :disabled="product.stock <= 0 || isAdding"
               type="button"
-              class="btn flex-1 py-3 px-6 bg-green-600 hover:bg-green-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-green-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              class="btn flex-1 py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
             >
               <i v-if="isAdding" class="ti ti-loader-2 animate-spin text-base"></i>
-              <i v-else class="ti ti-plus text-base"></i>
+              <i v-else class="ti ti-shopping-cart-plus text-base"></i>
               <span>{{ isAdding ? 'Menambahkan...' : 'Tambah ke Keranjang' }}</span>
             </button>
 
@@ -157,7 +156,7 @@
               @click="handleBuyNow"
               :disabled="product.stock <= 0"
               type="button"
-              class="btn py-3 px-6 bg-gray-900 hover:bg-gray-800 text-white font-bold text-xs sm:text-sm rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+              class="btn py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               <span>Beli Sekarang</span>
               <i class="ti ti-arrow-right text-sm"></i>
@@ -165,25 +164,25 @@
           </div>
         </div>
 
-        <!-- FreshCart Product Specification Table -->
-        <div class="pt-4 border-t border-gray-200">
+        <!-- Bookverse Specification Table -->
+        <div class="pt-4 border-t border-slate-200">
           <table class="w-full text-xs text-left">
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-slate-100">
               <tr>
-                <td class="py-2.5 text-gray-500 w-1/3">Kode SKU</td>
-                <td class="py-2.5 font-mono font-semibold text-gray-800">{{ product.sku || 'SAYUR-PRD-' + product.id }}</td>
+                <td class="py-2.5 text-slate-500 w-1/3">Format Edisi</td>
+                <td class="py-2.5 font-semibold text-slate-800">{{ product.variant_name || 'Buku Cetak Fisik' }}</td>
               </tr>
               <tr>
-                <td class="py-2.5 text-gray-500">Kategori</td>
-                <td class="py-2.5 font-semibold text-gray-800">{{ product.category?.name || 'Sayur' }}</td>
+                <td class="py-2.5 text-slate-500">Kategori Genre</td>
+                <td class="py-2.5 font-semibold text-slate-800">{{ product.category?.name || 'Buku Pilihan' }}</td>
               </tr>
               <tr>
-                <td class="py-2.5 text-gray-500">Model Pengiriman</td>
-                <td class="py-2.5 font-semibold text-green-700">100% Home Delivery (24 Jam Non-Stop)</td>
+                <td class="py-2.5 text-slate-500">Standar Pengemasan</td>
+                <td class="py-2.5 font-semibold text-indigo-700">Bubble Wrap Tebal Berlapis + Kardus Aman Anti-Tekuk</td>
               </tr>
               <tr>
-                <td class="py-2.5 text-gray-500">Jaminan Kualitas</td>
-                <td class="py-2.5 text-gray-800">100% Sayur Segar & Higienis</td>
+                <td class="py-2.5 text-slate-500">Keaslian Buku</td>
+                <td class="py-2.5 text-emerald-700 font-bold">100% Original Langsung dari Penerbit Resmi</td>
               </tr>
             </tbody>
           </table>

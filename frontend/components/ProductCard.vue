@@ -1,30 +1,30 @@
 <template>
-  <div class="relative rounded-lg break-words border bg-white border-gray-300 transition duration-75 hover:transition hover:duration-500 ease-in-out hover:border-green-600 hover:shadow-md card-product flex flex-col justify-between h-full group">
+  <div class="relative rounded-2xl break-words border bg-white border-slate-200 transition-all duration-300 hover:border-indigo-500 hover:shadow-xl hover:-translate-y-1 card-product flex flex-col justify-between h-full group overflow-hidden">
     <div class="p-4 flex-auto flex flex-col justify-between">
-      <!-- Image & Badges -->
+      <!-- Book Cover Image & Badges -->
       <div class="text-center relative flex justify-center mb-3">
         <!-- Discount / Status Badge -->
-        <div v-if="hasDiscount" class="absolute top-0 left-0 z-10">
-          <span class="inline-block px-1.5 py-0.5 text-center font-bold text-xs align-baseline leading-none rounded bg-red-600 text-white">
+        <div v-if="hasDiscount" class="absolute top-1 left-1 z-10">
+          <span class="inline-block px-2 py-0.5 text-center font-extrabold text-[10px] rounded-md bg-rose-600 text-white shadow-xs">
             -{{ discountPercentage }}%
           </span>
         </div>
-        <div v-else-if="product.stock <= 0" class="absolute top-0 left-0 z-10">
-          <span class="inline-block px-1.5 py-0.5 text-center font-bold text-xs align-baseline leading-none rounded bg-gray-600 text-white">
-            Habis
+        <div v-else-if="product.stock <= 0" class="absolute top-1 left-1 z-10">
+          <span class="inline-block px-2 py-0.5 text-center font-bold text-[10px] rounded-md bg-slate-600 text-white shadow-xs">
+            Stok Habis
           </span>
         </div>
-        <div v-else class="absolute top-0 left-0 z-10">
-          <span class="inline-block px-1.5 py-0.5 text-center font-bold text-xs align-baseline leading-none rounded bg-green-600 text-white">
-            Segar
+        <div v-else class="absolute top-1 left-1 z-10">
+          <span class="inline-block px-2 py-0.5 text-center font-bold text-[10px] rounded-md bg-indigo-600 text-white shadow-xs">
+            Original
           </span>
         </div>
 
-        <NuxtLink :to="`/products/${product.slug}`" class="block w-full overflow-hidden aspect-square flex items-center justify-center">
+        <NuxtLink :to="`/products/${product.slug}`" class="block w-full overflow-hidden aspect-[3/4] flex items-center justify-center bg-slate-50 rounded-xl p-1 shadow-inner">
           <img
-            :src="product.image || '/assets/images/products/product-img-1.jpg'"
+            :src="product.image || '/images/products/book-atomic-habits.jpg'"
             :alt="product.name"
-            class="w-full h-auto max-h-44 object-contain group-hover:scale-105 transition-transform duration-300"
+            class="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300 shadow-sm"
             loading="lazy"
           />
         </NuxtLink>
@@ -33,51 +33,46 @@
         <div class="absolute w-full bottom-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
           <NuxtLink
             :to="`/products/${product.slug}`"
-            class="h-8 w-8 bg-white shadow-md inline-flex items-center justify-center rounded-lg text-gray-700 hover:bg-green-600 hover:text-white transition-colors"
-            title="Lihat Detail"
+            class="h-8 w-8 bg-white/95 shadow-md inline-flex items-center justify-center rounded-xl text-slate-700 hover:bg-indigo-600 hover:text-white transition-all backdrop-blur-xs"
+            title="Sinopsis & Detail"
           >
-            <i class="ti ti-eye text-base"></i>
+            <i class="ti ti-eye text-sm"></i>
           </NuxtLink>
-          <button
-            type="button"
-            class="h-8 w-8 bg-white shadow-md inline-flex items-center justify-center rounded-lg text-gray-700 hover:bg-green-600 hover:text-white transition-colors"
-            title="Suka"
-          >
-            <i class="ti ti-heart text-base"></i>
-          </button>
         </div>
       </div>
 
-      <!-- Product Meta & Info -->
-      <div class="flex flex-col gap-2 mt-auto">
-        <div class="flex items-center justify-between text-xs text-gray-500">
-          <span>{{ product.category?.name || 'Sayuran & Segar' }}</span>
-          <span v-if="product.weight" class="text-gray-400">{{ product.weight }}g</span>
+      <!-- Book Meta & Info -->
+      <div class="flex flex-col gap-1.5 mt-auto">
+        <div class="flex items-center justify-between text-[11px] text-slate-500">
+          <span class="font-medium truncate max-w-[120px]">{{ product.category?.name || 'Buku Pilihan' }}</span>
+          <span v-if="product.variant_name" class="px-1.5 py-0.2 bg-slate-100 text-slate-600 rounded text-[10px] font-medium truncate max-w-[90px]">
+            {{ product.variant_name }}
+          </span>
         </div>
 
-        <h3 class="text-sm font-semibold text-gray-800 line-clamp-1 hover:text-green-600 transition-colors">
+        <h3 class="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 hover:text-indigo-600 transition-colors leading-snug">
           <NuxtLink :to="`/products/${product.slug}`">
             {{ product.name }}
           </NuxtLink>
         </h3>
 
         <!-- Rating Stars -->
-        <div class="flex items-center gap-1 text-yellow-500 text-xs">
+        <div class="flex items-center gap-1 text-amber-500 text-xs mt-0.5">
           <i class="ti ti-star-filled"></i>
           <i class="ti ti-star-filled"></i>
           <i class="ti ti-star-filled"></i>
           <i class="ti ti-star-filled"></i>
           <i class="ti ti-star-half-filled"></i>
-          <span class="text-gray-500 text-[11px] ml-1 font-medium">4.8 (24)</span>
+          <span class="text-slate-500 text-[10px] ml-1 font-semibold">4.9 (48 ulasan)</span>
         </div>
 
         <!-- Price & Add Button -->
-        <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+        <div class="flex justify-between items-center mt-2 pt-2.5 border-t border-slate-100">
           <div>
-            <span class="text-gray-900 font-bold text-sm block">
+            <span class="text-slate-900 font-extrabold text-xs sm:text-sm block">
               {{ formatIDR(effectivePrice) }}
             </span>
-            <span v-if="hasDiscount" class="line-through text-gray-400 text-xs">
+            <span v-if="hasDiscount" class="line-through text-slate-400 text-[11px]">
               {{ formatIDR(product.regular_price) }}
             </span>
           </div>
@@ -87,11 +82,11 @@
               @click="handleAddToCart"
               :disabled="product.stock <= 0 || isAdding"
               type="button"
-              class="btn inline-flex items-center gap-x-1 bg-green-600 text-white border-green-600 disabled:opacity-50 disabled:pointer-events-none hover:bg-green-700 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 text-xs py-1 px-2.5 rounded-lg font-semibold transition-all shadow-xs"
+              class="btn inline-flex items-center gap-1 bg-indigo-600 text-white disabled:opacity-50 disabled:pointer-events-none hover:bg-indigo-700 active:bg-indigo-800 text-xs py-1.5 px-3 rounded-xl font-bold transition-all shadow-xs"
             >
               <i v-if="isAdding" class="ti ti-loader-2 animate-spin text-xs"></i>
-              <i v-else class="ti ti-plus text-xs"></i>
-              <span>{{ isAdding ? '...' : 'Add' }}</span>
+              <i v-else class="ti ti-shopping-cart-plus text-xs"></i>
+              <span>{{ isAdding ? '...' : '+ Beli' }}</span>
             </button>
           </div>
         </div>

@@ -73,27 +73,27 @@ func SetupRoutes(app *fiber.App, cfg *RouterConfig) {
 	// Root Welcome & Health Check Routes
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"service":    "Enterprise eCommerce Platform API (Sayur FreshCart)",
+			"service":    "BookVerse - Enterprise BookStore Platform API",
 			"status":     "online",
 			"version":    "v1.0.0",
 			"frontend":   "http://127.0.0.1:3000",
 			"health":     "/health",
 			"api_v1":     "/api/v1",
-			"message":    "Backend API aktif. Untuk antarmuka web toko pelanggan & admin, silakan buka http://127.0.0.1:3000",
+			"message":    "Backend BookVerse API aktif. Untuk antarmuka web toko buku pelanggan & admin, silakan buka http://127.0.0.1:3000",
 		})
 	})
 
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status":  "healthy",
-			"service": "ecommerce-api",
+			"service": "bookverse-api",
 		})
 	})
 
 	api := app.Group("/api/v1")
 	api.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"service": "Sayur FreshCart REST API v1",
+			"service": "BookVerse REST API v1",
 			"status":  "running",
 			"endpoints": fiber.Map{
 				"health":     "/health",

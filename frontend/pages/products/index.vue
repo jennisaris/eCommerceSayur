@@ -2,38 +2,38 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-2 text-xs text-gray-500 mb-6">
-      <NuxtLink to="/" class="hover:text-green-600 flex items-center gap-1">
+      <NuxtLink to="/" class="hover:text-indigo-600 flex items-center gap-1">
         <i class="ti ti-home text-sm"></i>
         <span>Home</span>
       </NuxtLink>
       <span>/</span>
-      <span class="text-gray-800 font-semibold">Shop</span>
+      <span class="text-gray-800 font-semibold">Koleksi Buku</span>
     </nav>
 
     <!-- Header Section -->
     <div class="mb-8">
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Katalog Sayur & Belanja</h1>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Katalog Pustaka & Buku Pilihan</h1>
       <p class="text-xs sm:text-sm text-gray-500 mt-1">
-        Pilihan lengkap produk segar dan kebutuhan harian dengan jaminan 100% Home Delivery buka 24/7.
+        Eksplorasi ribuan judul buku fiksi, non-fiksi, sains, teknologi, dan manga orisinal dengan jaminan kualitas penerbit resmi.
       </p>
     </div>
 
-    <!-- Layout: Left Sidebar Filter + Right Product Grid (FreshCart Shop Style) -->
+    <!-- Layout: Left Sidebar Filter + Right Product Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
       <!-- Left Sidebar Filters -->
       <aside class="space-y-6 bg-white p-5 rounded-xl border border-gray-200">
         <!-- Search Input -->
         <div>
           <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <i class="ti ti-search text-green-600"></i> Cari Produk
+            <i class="ti ti-search text-indigo-600"></i> Cari Judul / Penulis
           </h3>
           <div class="relative">
             <input
               v-model="filters.search"
               @keyup.enter="fetchProducts"
               type="text"
-              placeholder="Ketik nama produk..."
-              class="w-full pl-9 pr-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600"
+              placeholder="Ketik judul buku, penulis, ISBN..."
+              class="w-full pl-9 pr-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600"
             />
             <i class="ti ti-search text-gray-400 absolute left-3 top-2.5 text-sm"></i>
           </div>
@@ -42,23 +42,23 @@
         <!-- Categories Filter List -->
         <div>
           <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <i class="ti ti-category text-green-600"></i> Kategori
+            <i class="ti ti-books text-indigo-600"></i> Genre & Kategori
           </h3>
           <ul class="space-y-1.5 text-xs text-gray-600">
             <li>
               <button
                 @click="selectCategory(0)"
-                :class="filters.category_id === 0 ? 'text-green-600 font-bold bg-green-50' : 'hover:text-green-600 hover:bg-gray-50'"
+                :class="filters.category_id === 0 ? 'text-indigo-600 font-bold bg-indigo-50' : 'hover:text-indigo-600 hover:bg-gray-50'"
                 class="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between transition-colors"
               >
-                <span>Semua Kategori</span>
+                <span>Semua Genre</span>
                 <i class="ti ti-chevron-right text-xs"></i>
               </button>
             </li>
             <li v-for="cat in categories" :key="cat.id">
               <button
                 @click="selectCategory(cat.id)"
-                :class="filters.category_id === cat.id ? 'text-green-600 font-bold bg-green-50' : 'hover:text-green-600 hover:bg-gray-50'"
+                :class="filters.category_id === cat.id ? 'text-indigo-600 font-bold bg-indigo-50' : 'hover:text-indigo-600 hover:bg-gray-50'"
                 class="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between transition-colors"
               >
                 <span>{{ cat.name }}</span>
@@ -71,14 +71,14 @@
         <!-- Price / Ordering Sort -->
         <div>
           <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <i class="ti ti-arrows-sort text-green-600"></i> Urutkan
+            <i class="ti ti-arrows-sort text-indigo-600"></i> Urutkan Buku
           </h3>
           <select
             v-model="filters.sort"
             @change="fetchProducts"
-            class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+            class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
-            <option value="latest">Terbaru</option>
+            <option value="latest">Terbitan Terbaru</option>
             <option value="price_asc">Harga Terendah</option>
             <option value="price_desc">Harga Tertinggi</option>
           </select>
@@ -93,11 +93,11 @@
           <span>Reset Filter</span>
         </button>
 
-        <!-- Fresh Grocery Delivery Banner in Sidebar -->
-        <div class="p-4 rounded-xl bg-green-50 border border-green-200 text-center space-y-2">
-          <i class="ti ti-truck text-2xl text-green-600"></i>
-          <h4 class="text-xs font-bold text-green-900">100% Home Delivery</h4>
-          <p class="text-[11px] text-green-700">Kebutuhan belanja diantar langsung ke rumah 24/7 tanpa antre.</p>
+        <!-- Book Protection Banner in Sidebar -->
+        <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-100 text-center space-y-2">
+          <i class="ti ti-shield-check text-2xl text-indigo-600"></i>
+          <h4 class="text-xs font-bold text-indigo-950">100% Original & Aman</h4>
+          <p class="text-[11px] text-indigo-700 leading-relaxed">Semua buku dibungkus ekstra double bubble wrap & kardus sudut anti-penyok.</p>
         </div>
       </aside>
 
@@ -106,14 +106,14 @@
         <!-- Top Toolbar -->
         <div class="bg-white p-4 rounded-xl border border-gray-200 flex flex-wrap items-center justify-between gap-4">
           <div class="text-xs text-gray-600">
-            Menampilkan <span class="font-bold text-gray-900">{{ products.length }}</span> produk
-            <span v-if="filters.search" class="text-green-600 font-semibold"> untuk "{{ filters.search }}"</span>
+            Menampilkan <span class="font-bold text-gray-900">{{ products.length }}</span> buku
+            <span v-if="filters.search" class="text-indigo-600 font-semibold"> untuk "{{ filters.search }}"</span>
           </div>
 
           <div class="flex items-center gap-3">
             <button
               @click="fetchProducts"
-              class="btn px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center gap-1"
+              class="btn px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center gap-1"
             >
               <i class="ti ti-filter text-xs"></i>
               <span>Terapkan</span>
@@ -123,18 +123,18 @@
 
         <!-- Products Grid -->
         <div v-if="isLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <div v-for="n in 8" :key="n" class="h-72 rounded-lg bg-gray-200 animate-pulse"></div>
+          <div v-for="n in 8" :key="n" class="h-80 rounded-lg bg-gray-200 animate-pulse"></div>
         </div>
 
         <div v-else-if="products.length === 0" class="text-center py-20 bg-white rounded-2xl border border-gray-200 p-8">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-            <i class="ti ti-package-off text-3xl"></i>
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+            <i class="ti ti-book-off text-3xl"></i>
           </div>
-          <h3 class="text-base font-bold text-gray-800">Tidak ada produk ditemukan</h3>
-          <p class="text-xs text-gray-500 mt-1">Coba gunakan kata kunci pencarian lain atau ubah filter kategori.</p>
+          <h3 class="text-base font-bold text-gray-800">Tidak ada buku ditemukan</h3>
+          <p class="text-xs text-gray-500 mt-1">Coba gunakan judul buku lain atau ubah filter kategori genre.</p>
           <button
             @click="resetFilters"
-            class="mt-4 px-4 py-2 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-all shadow-xs"
+            class="mt-4 px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition-all shadow-xs"
           >
             Reset Semua Filter
           </button>

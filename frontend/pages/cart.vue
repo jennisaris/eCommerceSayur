@@ -2,33 +2,33 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-2 text-xs text-gray-500 mb-6">
-      <NuxtLink to="/" class="hover:text-green-600 flex items-center gap-1">
+      <NuxtLink to="/" class="hover:text-indigo-600 flex items-center gap-1">
         <i class="ti ti-home text-sm"></i>
         <span>Home</span>
       </NuxtLink>
       <span>/</span>
-      <NuxtLink to="/products" class="hover:text-green-600">Shop</NuxtLink>
+      <NuxtLink to="/products" class="hover:text-indigo-600">Koleksi Buku</NuxtLink>
       <span>/</span>
-      <span class="text-gray-800 font-semibold">Shop Cart</span>
+      <span class="text-gray-800 font-semibold">Keranjang Belanja</span>
     </nav>
 
     <div class="mb-8">
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Keranjang Belanja</h1>
-      <p class="text-xs sm:text-sm text-gray-500 mt-1">Periksa daftar pesanan sayuran dan bahan dapur Anda sebelum checkout.</p>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Keranjang Belanja Buku</h1>
+      <p class="text-xs sm:text-sm text-gray-500 mt-1">Periksa daftar buku, novel, dan bacaan pilihan Anda sebelum melanjutkan pesanan.</p>
     </div>
 
     <!-- Empty state -->
     <div v-if="cartStore.items.length === 0" class="text-center py-20 bg-white rounded-2xl border border-gray-200 p-8 max-w-xl mx-auto shadow-xs">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-        <i class="ti ti-shopping-cart-off text-3xl"></i>
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+        <i class="ti ti-book-off text-3xl"></i>
       </div>
-      <h3 class="text-base font-bold text-gray-800">Keranjang Belanja Anda Kosong</h3>
-      <p class="text-xs text-gray-500 mt-1">Anda belum menambahkan produk apa pun ke keranjang belanja.</p>
+      <h3 class="text-base font-bold text-gray-800">Keranjang Buku Anda Masih Kosong</h3>
+      <p class="text-xs text-gray-500 mt-1">Belum ada buku yang ditambahkan ke keranjang pesanan.</p>
       <NuxtLink
         to="/products"
-        class="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-xl text-xs font-bold hover:bg-green-700 transition-all shadow-sm"
+        class="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-all shadow-sm"
       >
-        <span>Mulai Belanja Sekarang</span>
+        <span>Eksplorasi Katalog Buku</span>
         <i class="ti ti-arrow-right text-xs"></i>
       </NuxtLink>
     </div>
@@ -38,17 +38,17 @@
       <!-- Items Table/List -->
       <div class="lg:col-span-2 space-y-4">
         <!-- Delivery info alert -->
-        <div class="p-3.5 bg-green-50 border border-green-200 rounded-xl text-xs text-green-900 flex items-center justify-between">
+        <div class="p-3.5 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <i class="ti ti-truck text-base text-green-600"></i>
-            <span>Layanan <strong>100% Home Delivery</strong> siap antar 24/7 non-stop</span>
+            <i class="ti ti-shield-check text-base text-indigo-600"></i>
+            <span>Standar Pengemasan Buku: <strong>Double Bubble Wrap & Karton Sudut</strong></span>
           </div>
-          <span class="font-bold text-green-700">24 Jam</span>
+          <span class="font-bold text-indigo-700">100% Aman</span>
         </div>
 
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-xs">
           <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-            <span class="text-xs font-bold text-gray-800">Daftar Produk ({{ cartStore.totalItems }} Item)</span>
+            <span class="text-xs font-bold text-gray-800">Daftar Buku ({{ cartStore.totalItems }} Item)</span>
             <button
               @click="confirmClearCart"
               type="button"
@@ -69,14 +69,14 @@
                 <img
                   :src="item.product?.image || '/assets/images/products/product-img-1.jpg'"
                   :alt="item.product?.name"
-                  class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-contain bg-gray-50 border border-gray-200 flex-shrink-0"
+                  class="w-16 h-22 rounded-md object-cover bg-gray-50 border border-gray-200 shadow-xs flex-shrink-0"
                 />
                 <div>
                   <h3 class="text-xs sm:text-sm font-bold text-gray-900 line-clamp-1">
                     {{ item.product?.name }}
                   </h3>
                   <div class="text-xs text-gray-500 mt-1">
-                    {{ formatIDR(item.product?.sale_price && item.product.sale_price > 0 ? item.product.sale_price : item.product?.regular_price || 0) }} / unit
+                    {{ formatIDR(item.product?.sale_price && item.product.sale_price > 0 ? item.product.sale_price : item.product?.regular_price || 0) }} / buku
                   </div>
                   <div class="text-[11px] text-gray-400 mt-0.5">Berat: {{ item.product?.weight || 0 }} gram</div>
                 </div>
@@ -125,18 +125,18 @@
             class="btn px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-lg text-xs font-semibold hover:bg-gray-50 flex items-center gap-1.5 transition-colors"
           >
             <i class="ti ti-arrow-left text-xs"></i>
-            <span>Lanjut Belanja</span>
+            <span>Lanjut Cari Buku</span>
           </NuxtLink>
         </div>
       </div>
 
       <!-- Summary Sidebar -->
       <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-xs space-y-5 sticky top-24">
-        <h3 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Ringkasan Belanja</h3>
+        <h3 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Ringkasan Pesanan</h3>
 
         <div class="space-y-3 text-xs">
           <div class="flex justify-between text-gray-600">
-            <span>Subtotal Produk</span>
+            <span>Subtotal Buku</span>
             <span class="font-bold text-gray-900">{{ formatIDR(cartStore.totalPrice) }}</span>
           </div>
 
@@ -146,19 +146,19 @@
           </div>
 
           <div class="flex justify-between text-gray-600">
-            <span>Pengiriman</span>
-            <span class="text-green-600 font-semibold">Dihitung saat checkout</span>
+            <span>Pengiriman Ekspedisi</span>
+            <span class="text-indigo-600 font-semibold">Dihitung saat checkout</span>
           </div>
 
           <div class="pt-3 border-t border-gray-200 flex justify-between items-center text-sm">
-            <span class="font-bold text-gray-900">Total Sementara</span>
-            <span class="text-base font-black text-green-600">{{ formatIDR(cartStore.totalPrice) }}</span>
+            <span class="font-bold text-gray-900">Total Pembayaran</span>
+            <span class="text-base font-black text-indigo-600">{{ formatIDR(cartStore.totalPrice) }}</span>
           </div>
         </div>
 
         <NuxtLink
           to="/checkout"
-          class="btn w-full py-3.5 px-4 bg-green-600 hover:bg-green-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-green-600/25 flex items-center justify-center gap-2 transition-all"
+          class="btn w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all"
         >
           <span>Lanjut ke Checkout</span>
           <i class="ti ti-arrow-right text-sm"></i>
@@ -166,7 +166,7 @@
 
         <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
           <div class="text-[11px] text-gray-500 flex items-center justify-center gap-1">
-            <i class="ti ti-shield-check text-green-600 text-sm"></i>
+            <i class="ti ti-shield-check text-indigo-600 text-sm"></i>
             <span>Transaksi Dijamin Aman & Idempoten</span>
           </div>
         </div>

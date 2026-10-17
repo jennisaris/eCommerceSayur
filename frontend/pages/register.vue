@@ -13,9 +13,9 @@
       <!-- Sign Up Form -->
       <div class="w-full md:w-7/12 lg:w-5/12 max-w-md order-1 lg:order-2 bg-white p-8 rounded-2xl border border-gray-200 shadow-sm space-y-5">
         <div class="space-y-1">
-          <h1 class="text-2xl font-extrabold text-gray-900">Get Started with FreshCart</h1>
+          <h1 class="text-2xl font-extrabold text-gray-900">Bergabung dengan BookVerse</h1>
           <p class="text-xs text-gray-500">
-            Daftar akun sekarang dan nikmati belanja kebutuhan sayur segar 24/7 diantar langsung ke rumah.
+            Daftar akun sekarang untuk kemudahan belanja ribuan koleksi buku pilihan dengan proteksi kemasan kardus & bubble wrap maksimal.
           </p>
         </div>
 
@@ -34,7 +34,7 @@
                 type="text"
                 required
                 placeholder="Nama Lengkap Anda"
-                class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+                class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
               <i class="ti ti-user text-gray-400 absolute left-3 top-3 text-sm"></i>
             </div>
@@ -48,7 +48,7 @@
                 type="email"
                 required
                 placeholder="nama@email.com"
-                class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+                class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
               <i class="ti ti-mail text-gray-400 absolute left-3 top-3 text-sm"></i>
             </div>
@@ -63,7 +63,7 @@
                 required
                 minlength="6"
                 placeholder="Minimal 6 karakter"
-                class="w-full pl-9 pr-9 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+                class="w-full pl-9 pr-9 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
               <i class="ti ti-lock text-gray-400 absolute left-3 top-3 text-sm"></i>
               <button
@@ -83,7 +83,7 @@
                 v-model="form.phone"
                 type="tel"
                 placeholder="081234567890"
-                class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+                class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
               <i class="ti ti-phone text-gray-400 absolute left-3 top-3 text-sm"></i>
             </div>
@@ -94,15 +94,15 @@
             <textarea
               v-model="form.address"
               rows="2"
-              placeholder="Alamat rumah atau kantor untuk 100% Home Delivery..."
-              class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+              placeholder="Alamat rumah atau kantor lengkap untuk pengiriman buku..."
+              class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
             ></textarea>
           </div>
 
           <button
             :disabled="isLoading"
             type="submit"
-            class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-green-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50 mt-2"
+            class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50 mt-2"
           >
             <i v-if="isLoading" class="ti ti-loader-2 animate-spin text-base"></i>
             <span v-else>Daftar Sekarang</span>
@@ -111,7 +111,7 @@
 
         <div class="text-center text-xs text-gray-500 pt-3 border-t border-gray-100">
           Sudah memiliki akun?
-          <NuxtLink to="/login" class="font-bold text-green-600 hover:underline ml-1">
+          <NuxtLink to="/login" class="font-bold text-indigo-600 hover:underline ml-1">
             Sign In di Sini
           </NuxtLink>
         </div>

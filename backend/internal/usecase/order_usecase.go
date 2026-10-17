@@ -163,8 +163,8 @@ func (u *OrderUseCase) CreateOrder(ctx context.Context, userID int64, req *domai
 		_ = u.notifRepo.Create(ctx, &domain.Notification{
 			ReceiverID:       userID,
 			NotificationType: "ORDER_STATUS",
-			Subject:          fmt.Sprintf("Pesanan Dibuat (%s)", order.OrderCode),
-			Message:          fmt.Sprintf("Pesanan Anda dengan kode %s telah dibuat. Silakan selesaikan pembayaran sebelum batas waktu berakhir.", order.OrderCode),
+			Subject:          fmt.Sprintf("Pesanan Buku Dibuat (%s)", order.OrderCode),
+			Message:          fmt.Sprintf("Pesanan buku Anda dengan kode %s telah dibuat. Paket buku original Anda akan dikemas dengan bubble wrap tebal dan segera dikirim setelah pembayaran terverifikasi.", order.OrderCode),
 		})
 	}
 

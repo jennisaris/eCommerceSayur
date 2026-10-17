@@ -11,9 +11,9 @@
         <!-- Drawer Header -->
         <div class="p-5 border-b border-gray-200 flex items-center justify-between bg-white">
           <div class="flex items-center gap-2">
-            <i class="ti ti-shopping-bag text-xl text-green-600"></i>
-            <h2 class="text-base font-bold text-gray-900">Shop Cart</h2>
-            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200">
+            <i class="ti ti-shopping-bag text-xl text-indigo-600"></i>
+            <h2 class="text-base font-bold text-gray-900">Keranjang Buku</h2>
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
               {{ cartStore.totalItems }}
             </span>
           </div>
@@ -25,10 +25,13 @@
           </button>
         </div>
 
-        <!-- Free Delivery Alert Banner from Template -->
-        <div class="bg-red-50 text-red-800 text-xs px-5 py-3 border-b border-red-100 flex items-center justify-between">
-          <span>Anda mendapatkan <strong>100% Home Delivery</strong> langsung ke rumah!</span>
-          <NuxtLink to="/checkout" @click="cartStore.closeDrawer" class="text-green-700 font-bold hover:underline">
+        <!-- Packaging Protection Alert Banner -->
+        <div class="bg-indigo-50 text-indigo-900 text-xs px-5 py-2.5 border-b border-indigo-100 flex items-center justify-between">
+          <span class="flex items-center gap-1.5 font-medium">
+            <i class="ti ti-shield-check text-indigo-600 text-sm"></i>
+            Kemasan aman dengan bubble wrap & kardus tebal!
+          </span>
+          <NuxtLink to="/checkout" @click="cartStore.closeDrawer" class="text-indigo-700 font-bold hover:underline">
             Checkout
           </NuxtLink>
         </div>
@@ -36,30 +39,30 @@
         <!-- Cart Items List -->
         <div class="flex-1 overflow-y-auto p-5 space-y-4">
           <div v-if="cartStore.items.length === 0" class="text-center py-16">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-              <i class="ti ti-shopping-cart-off text-3xl"></i>
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+              <i class="ti ti-book-off text-3xl"></i>
             </div>
-            <p class="text-sm font-semibold text-gray-800">Keranjang Anda masih kosong</p>
-            <p class="text-xs text-gray-500 mt-1">Pilih produk sayuran segar favorit Anda di katalog.</p>
+            <p class="text-sm font-semibold text-gray-800">Keranjang Buku Anda masih kosong</p>
+            <p class="text-xs text-gray-500 mt-1">Eksplorasi ribuan judul buku fiksi, non-fiksi, dan teknologi di katalog.</p>
             <NuxtLink
               to="/products"
               @click="cartStore.closeDrawer"
-              class="mt-4 inline-block px-4 py-2 text-xs font-bold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-xs"
+              class="mt-4 inline-block px-4 py-2 text-xs font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-xs"
             >
-              Mulai Belanja
+              Cari Buku Sekarang
             </NuxtLink>
           </div>
 
           <div
             v-for="item in cartStore.items"
             :key="item.id"
-            class="flex gap-3.5 p-3 rounded-lg border border-gray-200 hover:border-green-600 bg-white transition-all"
+            class="flex gap-3.5 p-3 rounded-lg border border-gray-200 hover:border-indigo-600 bg-white transition-all"
           >
-            <!-- Product Image -->
+            <!-- Product Image (Book Cover Aspect Ratio) -->
             <img
               :src="item.product?.image || '/assets/images/products/product-img-1.jpg'"
-              alt="Product"
-              class="w-16 h-16 rounded-lg object-contain bg-gray-50 flex-shrink-0"
+              alt="Book Cover"
+              class="w-14 h-20 rounded-md object-cover bg-gray-50 flex-shrink-0 shadow-xs border border-gray-100"
             />
 
             <!-- Details -->
@@ -136,7 +139,7 @@
             <NuxtLink
               to="/checkout"
               @click="cartStore.closeDrawer"
-              class="btn py-2.5 px-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg shadow-sm text-center flex items-center justify-center gap-1 transition-all"
+              class="btn py-2.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm text-center flex items-center justify-center gap-1 transition-all"
             >
               <span>Checkout</span>
               <i class="ti ti-arrow-right text-xs"></i>

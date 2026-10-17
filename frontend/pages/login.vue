@@ -13,9 +13,9 @@
       <!-- Sign In Form -->
       <div class="w-full md:w-7/12 lg:w-5/12 max-w-md order-1 lg:order-2 bg-white p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
         <div class="space-y-1">
-          <h1 class="text-2xl font-extrabold text-gray-900">Sign In to FreshCart</h1>
+          <h1 class="text-2xl font-extrabold text-gray-900">Sign In to BookVerse</h1>
           <p class="text-xs text-gray-500">
-            Selamat datang kembali! Masuk untuk memesan sayuran segar dan cek status pesanan.
+            Selamat datang kembali! Masuk untuk memesan buku favorit Anda dan pantau status pengiriman.
           </p>
         </div>
 
@@ -34,7 +34,7 @@
             <button
               @click="fillCustomer"
               type="button"
-              class="px-2.5 py-1.5 text-xs font-bold bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 rounded-lg transition-colors flex items-center justify-center gap-1"
+              class="px-2.5 py-1.5 text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 rounded-lg transition-colors flex items-center justify-center gap-1"
             >
               <i class="ti ti-user text-xs"></i>
               <span>Customer</span>
@@ -58,7 +58,7 @@
                 type="email"
                 required
                 placeholder="nama@email.com"
-                class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+                class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
               <i class="ti ti-mail text-gray-400 absolute left-3 top-3 text-sm"></i>
             </div>
@@ -67,7 +67,7 @@
           <div>
             <div class="flex items-center justify-between mb-1.5">
               <label class="block text-xs font-bold text-gray-700">Kata Sandi</label>
-              <span class="text-[11px] text-green-600 hover:underline cursor-pointer">Lupa Password?</span>
+              <span class="text-[11px] text-indigo-600 hover:underline cursor-pointer">Lupa Password?</span>
             </div>
             <div class="relative">
               <input
@@ -75,7 +75,7 @@
                 :type="showPassword ? 'text' : 'password'"
                 required
                 placeholder="••••••••"
-                class="w-full pl-9 pr-9 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-600 transition-all"
+                class="w-full pl-9 pr-9 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
               <i class="ti ti-lock text-gray-400 absolute left-3 top-3 text-sm"></i>
               <button
@@ -91,7 +91,7 @@
           <button
             :disabled="isLoading"
             type="submit"
-            class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-green-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+            class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
           >
             <i v-if="isLoading" class="ti ti-loader-2 animate-spin text-base"></i>
             <span v-else>Sign In</span>
@@ -100,7 +100,7 @@
 
         <div class="text-center text-xs text-gray-500 pt-3 border-t border-gray-100">
           Belum memiliki akun?
-          <NuxtLink to="/register" class="font-bold text-green-600 hover:underline ml-1">
+          <NuxtLink to="/register" class="font-bold text-indigo-600 hover:underline ml-1">
             Sign Up Sekarang
           </NuxtLink>
         </div>

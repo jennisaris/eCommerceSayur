@@ -37,11 +37,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'NexStore - Premium 24/7 Delivery eCommerce',
+      title: 'BookVerse - Toko Buku Online Terlengkap & Pengiriman Cepat 24/7',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Modern, high-performance 24/7 delivery eCommerce platform with instant cross-device cart sync and Midtrans secure checkout.' }
+        { name: 'description', content: 'Platform toko buku online modern dengan koleksi buku fiksi, non-fiksi, bisnis, akademik, dan komik original terlengkap. Pengiriman cepat dan bergaransi resmi se-Indonesia.' }
       ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
