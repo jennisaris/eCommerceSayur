@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="400" height="560">
+  <defs>
+    <!-- Shonen Vibrant Cover Gradient -->
+    <linearGradient id="bg-op" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7f1d1d" />
+      <stop offset="35%" stop-color="#b91c1c" />
+      <stop offset="70%" stop-color="#ea580c" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <linearGradient id="straw-hat-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#facc15" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+    <linearGradient id="spine-op" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.45" />
+      <stop offset="4%" stop-color="#ffffff" stop-opacity="0.15" />
+      <stop offset="8%" stop-color="#000000" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="560" rx="6" fill="url(#bg-op)" />
+
+  <!-- Action Speed Lines Radiating from center -->
+  <g opacity="0.2" stroke="#ffffff" stroke-width="2">
+    <line x1="200" y1="280" x2="0" y2="40" />
+    <line x1="200" y1="280" x2="40" y2="0" />
+    <line x1="200" y1="280" x2="200" y2="0" />
+    <line x1="200" y1="280" x2="360" y2="0" />
+    <line x1="200" y1="280" x2="400" y2="50" />
+    <line x1="200" y1="280" x2="400" y2="200" />
+    <line x1="200" y1="280" x2="400" y2="400" />
+    <line x1="200" y1="280" x2="320" y2="560" />
+    <line x1="200" y1="280" x2="100" y2="560" />
+    <line x1="200" y1="280" x2="0" y2="420" />
+    <line x1="200" y1="280" x2="0" y2="240" />
+  </g>
+
+  <!-- Top Jump Comics & Publisher Badge -->
+  <g transform="translate(40, 28)">
+    <rect width="110" height="26" rx="4" fill="#0f172a" />
+    <text x="55" y="17" text-anchor="middle" font-family="'Impact', sans-serif" font-size="12" fill="#ef4444" letter-spacing="1">SHONEN JUMP</text>
+  </g>
+
+  <g transform="translate(320, 28)">
+    <circle cx="20" cy="13" r="13" fill="#dc2626" stroke="#ffffff" stroke-width="2" />
+    <text x="20" y="17" text-anchor="middle" font-family="'Impact', sans-serif" font-size="10" fill="#ffffff">ELEX</text>
+  </g>
+
+  <!-- Big Stylized ONE PIECE Title -->
+  <g transform="translate(200, 100)">
+    <!-- Outline Glow -->
+    <text x="0" y="0" text-anchor="middle" font-family="'Impact', 'Arial Black', sans-serif" font-size="52" fill="#1e293b" letter-spacing="3" stroke="#ffffff" stroke-width="8">ONE PIECE</text>
+    <text x="0" y="0" text-anchor="middle" font-family="'Impact', 'Arial Black', sans-serif" font-size="52" fill="#0284c7" letter-spacing="3">ONE PIECE</text>
+  </g>
+
+  <!-- Giant "100" Commemorative Volume Badge -->
+  <g transform="translate(200, 160)">
+    <rect x="-90" y="-18" width="180" height="38" rx="19" fill="#0f172a" stroke="url(#straw-hat-gold)" stroke-width="2" />
+    <text x="0" y="8" text-anchor="middle" font-family="'Impact', sans-serif" font-size="24" fill="url(#straw-hat-gold)" letter-spacing="2">VOLUME 100</text>
+  </g>
+
+  <!-- Subtitle Chapter Name -->
+  <text x="200" y="218" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="900" fill="#ffffff" letter-spacing="2">"HAOSHOKU"</text>
+  <text x="200" y="236" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#fef08a">PERTEMPURAN PUNCAK ONIGASHIMA</text>
+
+  <!-- Center Artwork: Straw Hat Skull Jolly Roger -->
+  <g transform="translate(200, 340)">
+    <!-- Red Haki Lightning Aura -->
+    <path d="M -70 -20 L -40 10 L -60 40 L -20 60" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" />
+    <path d="M 70 -20 L 40 10 L 60 40 L 20 60" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Crossbones behind Skull -->
+    <path d="M -60 -50 L 60 50" stroke="#f8fafc" stroke-width="12" stroke-linecap="round" />
+    <path d="M 60 -50 L -60 50" stroke="#f8fafc" stroke-width="12" stroke-linecap="round" />
+    <!-- Bone Ends -->
+    <circle cx="-62" cy="-52" r="8" fill="#f8fafc" />
+    <circle cx="62" cy="52" r="8" fill="#f8fafc" />
+    <circle cx="62" cy="-52" r="8" fill="#f8fafc" />
+    <circle cx="-62" cy="52" r="8" fill="#f8fafc" />
+
+    <!-- White Skull Body -->
+    <ellipse cx="0" cy="5" rx="36" ry="34" fill="#ffffff" stroke="#0f172a" stroke-width="3" />
+    <!-- Eye Sockets -->
+    <circle cx="-14" cy="2" r="8" fill="#0f172a" />
+    <circle cx="14" cy="2" r="8" fill="#0f172a" />
+    <!-- Nose -->
+    <polygon points="0,12 -3,18 3,18" fill="#0f172a" />
+    <!-- Wide Grin Teeth -->
+    <path d="M -18 25 Q 0 34 18 25" stroke="#0f172a" stroke-width="3" fill="none" />
+    <line x1="-8" y1="24" x2="-8" y2="30" stroke="#0f172a" stroke-width="2" />
+    <line x1="0" y1="26" x2="0" y2="32" stroke="#0f172a" stroke-width="2" />
+    <line x1="8" y1="24" x2="8" y2="30" stroke="#0f172a" stroke-width="2" />
+
+    <!-- Straw Hat on Skull -->
+    <ellipse cx="0" cy="-22" rx="55" ry="14" fill="url(#straw-hat-gold)" stroke="#78350f" stroke-width="2" />
+    <!-- Hat Crown -->
+    <path d="M -26 -22 C -26 -44 26 -44 26 -22 Z" fill="url(#straw-hat-gold)" stroke="#78350f" stroke-width="2" />
+    <!-- Red Hat Ribbon -->
+    <path d="M -26 -22 C -26 -28 26 -28 26 -22 L 26 -19 C 26 -25 -26 -25 -26 -19 Z" fill="#dc2626" />
+  </g>
+
+  <!-- Author Name -->
+  <g transform="translate(200, 480)">
+    <text x="0" y="0" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#fef08a" letter-spacing="2">KARYA</text>
+    <text x="0" y="24" text-anchor="middle" font-family="'Impact', sans-serif" font-size="26" fill="#ffffff" letter-spacing="2">EIICHIRO ODA</text>
+  </g>
+
+  <!-- Publisher Note -->
+  <g transform="translate(200, 532)">
+    <text x="0" y="0" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#fed7aa" letter-spacing="1">ELEX MEDIA KOMPUTINDO • GRAMEDIA GROUP</text>
+  </g>
+
+  <!-- 3D Spine Fold -->
+  <rect x="0" y="0" width="30" height="560" fill="url(#spine-op)" />
+</svg>

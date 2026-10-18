@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="400" height="560">
+  <defs>
+    <!-- Cover Gradient -->
+    <linearGradient id="bg-teras" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#042f2e" />
+      <stop offset="40%" stop-color="#134e4a" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <linearGradient id="gold-foil" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="40%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <!-- Spine Shadow -->
+    <linearGradient id="spine-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.45" />
+      <stop offset="4%" stop-color="#ffffff" stop-opacity="0.15" />
+      <stop offset="8%" stop-color="#000000" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Cover -->
+  <rect width="400" height="560" rx="6" fill="url(#bg-teras)" />
+
+  <!-- Stoic Classical Greek/Roman Pillar Arch Background -->
+  <g opacity="0.15" stroke="#fef08a" stroke-width="1.5">
+    <circle cx="200" cy="270" r="120" fill="none" stroke-dasharray="4 4" />
+    <circle cx="200" cy="270" r="140" fill="none" />
+    <line x1="80" y1="130" x2="80" y2="440" />
+    <line x1="320" y1="130" x2="320" y2="440" />
+  </g>
+
+  <!-- Best Seller Badge -->
+  <g transform="translate(40, 36)">
+    <rect width="180" height="26" rx="13" fill="#022c22" stroke="url(#gold-foil)" stroke-width="1.2" />
+    <text x="90" y="17" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="800" fill="url(#gold-foil)" letter-spacing="1.5">MEGA BEST SELLER</text>
+  </g>
+
+  <!-- Title Section -->
+  <text x="200" y="115" text-anchor="middle" font-family="'Plus Jakarta Sans', Georgia, serif" font-size="34" font-weight="900" fill="#ffffff" letter-spacing="3">FILOSOFI</text>
+  <text x="200" y="160" text-anchor="middle" font-family="'Plus Jakarta Sans', Georgia, serif" font-size="44" font-weight="900" fill="url(#gold-foil)" letter-spacing="5">TERAS</text>
+  
+  <line x1="120" y1="180" x2="280" y2="180" stroke="#2dd4bf" stroke-width="1.5" stroke-dasharray="3 3" />
+
+  <text x="200" y="202" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#ccfbf1" letter-spacing="1">FILSAFAT YUNANI-ROMAWI KUNO</text>
+  <text x="200" y="218" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="600" fill="#ccfbf1" letter-spacing="1">UNTUK MENTAL TANGGUH MASA KINI</text>
+
+  <!-- Center Stoic Marble Bust Artwork -->
+  <g transform="translate(140, 240)">
+    <!-- Aurelius / Stoic Head Outline & Highlights -->
+    <path d="M 60 20 C 35 20 20 40 20 65 C 20 85 30 100 40 115 L 40 145 C 40 152 45 158 55 160 L 65 160 C 75 158 80 152 80 145 L 80 115 C 90 100 100 85 100 65 C 100 40 85 20 60 20 Z" fill="#115e59" stroke="url(#gold-foil)" stroke-width="2" />
+    <!-- Classical Beard & Curls -->
+    <path d="M 32 60 C 28 85 45 110 60 125 C 75 110 92 85 88 60" fill="none" stroke="url(#gold-foil)" stroke-width="2" stroke-linecap="round" />
+    <path d="M 44 80 C 48 95 60 105 60 105 C 60 105 72 95 76 80" fill="none" stroke="#2dd4bf" stroke-width="1.5" />
+    <path d="M 40 50 Q 60 44 80 50" fill="none" stroke="url(#gold-foil)" stroke-width="2" stroke-linecap="round" />
+    <circle cx="48" cy="58" r="3" fill="#ccfbf1" />
+    <circle cx="72" cy="58" r="3" fill="#ccfbf1" />
+    <path d="M 60 58 L 60 74 L 56 76" fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" />
+    <!-- Laurel Wreath -->
+    <path d="M 22 46 C 35 34 50 32 60 32 C 70 32 85 34 98 46" fill="none" stroke="url(#gold-foil)" stroke-width="2.5" stroke-dasharray="2 4" stroke-linecap="round" />
+  </g>
+
+  <!-- Bottom Details & Author -->
+  <g transform="translate(200, 470)">
+    <text x="0" y="0" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#5eead4" letter-spacing="2">PENULIS BESTSELLER</text>
+    <text x="0" y="24" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="19" font-weight="900" fill="#ffffff" letter-spacing="2">HENRY MANAMPIRING</text>
+  </g>
+
+  <!-- Publisher Seal -->
+  <g transform="translate(200, 528)">
+    <text x="0" y="0" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#99f6e4" opacity="0.85" letter-spacing="1">PENERBIT BUKU KOMPAS</text>
+  </g>
+
+  <!-- Spine 3D Overlay -->
+  <rect x="0" y="0" width="30" height="560" fill="url(#spine-shadow)" />
+</svg>

@@ -148,7 +148,7 @@
           >
             <div class="flex items-center gap-3 min-w-0">
               <img
-                :src="item.product?.image || '/assets/images/products/product-img-1.jpg'"
+                :src="item.product?.image || '/images/products/book-atomic-habits.jpg'"
                 alt="Product"
                 class="w-10 h-14 object-cover rounded-md bg-gray-50 border border-gray-200 flex-shrink-0"
               />

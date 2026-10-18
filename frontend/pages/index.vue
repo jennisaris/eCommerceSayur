@@ -72,20 +72,26 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Banner 1: Novel & Sastra -->
-        <div class="rounded-2xl p-8 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white shadow-md relative overflow-hidden flex flex-col justify-between min-h-[220px] border border-indigo-800/50">
-          <div class="relative z-10 max-w-sm space-y-2">
-            <span class="text-[11px] font-bold text-amber-300 uppercase tracking-wider">Koleksi Fiksi & Sastra</span>
-            <h3 class="text-2xl font-extrabold leading-snug">
-              Novel Terlaris & Edisi Kolektor
+        <div class="rounded-2xl p-8 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 shadow-md relative overflow-hidden flex flex-col justify-between min-h-[220px] border border-indigo-700/60 group">
+          <!-- Background Watermark Graphic -->
+          <i class="ti ti-books absolute -right-2 -bottom-4 text-9xl text-indigo-400/10 -rotate-12 pointer-events-none group-hover:scale-105 transition-transform duration-500"></i>
+
+          <div class="relative z-10 max-w-sm space-y-2.5">
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-amber-300 uppercase tracking-wider bg-amber-400/10 px-2.5 py-1 rounded-md border border-amber-400/20">
+              <i class="ti ti-sparkles text-xs"></i>
+              <span>Koleksi Fiksi & Sastra</span>
+            </span>
+            <h3 class="text-2xl sm:text-3xl font-black leading-tight banner-heading-white !text-white drop-shadow-sm" style="color: #ffffff !important;">
+              Novel Terlaris &amp; Edisi Kolektor
             </h3>
-            <p class="text-xs text-indigo-200">
-              Dapatkan diskon spesial hingga <span class="font-bold text-white text-sm">30%</span> untuk novel pemenang penghargaan.
+            <p class="text-xs sm:text-sm banner-desc-light leading-relaxed" style="color: #e0e7ff !important;">
+              Dapatkan diskon spesial hingga <span class="font-extrabold text-amber-300 text-sm">30%</span> untuk novel berlisensi resmi dan karya pemenang penghargaan.
             </p>
           </div>
           <div class="relative z-10 mt-6">
             <NuxtLink
               to="/products"
-              class="inline-flex items-center gap-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-sm"
+              class="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md transform hover:-translate-y-0.5"
             >
               <span>Jelajahi Novel</span>
               <i class="ti ti-arrow-right text-xs"></i>
@@ -94,20 +100,26 @@
         </div>
 
         <!-- Banner 2: Self Improvement & Bisnis -->
-        <div class="rounded-2xl p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md relative overflow-hidden flex flex-col justify-between min-h-[220px] border border-slate-700/50">
-          <div class="relative z-10 max-w-sm space-y-2">
-            <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Pengembangan Diri & Finansial</span>
-            <h3 class="text-2xl font-extrabold leading-snug">
+        <div class="rounded-2xl p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 shadow-md relative overflow-hidden flex flex-col justify-between min-h-[220px] border border-slate-600/60 group">
+          <!-- Background Watermark Graphic -->
+          <i class="ti ti-bulb absolute -right-2 -bottom-4 text-9xl text-emerald-400/10 -rotate-12 pointer-events-none group-hover:scale-105 transition-transform duration-500"></i>
+
+          <div class="relative z-10 max-w-sm space-y-2.5">
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-300 uppercase tracking-wider bg-emerald-400/10 px-2.5 py-1 rounded-md border border-emerald-400/20">
+              <i class="ti ti-trending-up text-xs"></i>
+              <span>Pengembangan Diri & Finansial</span>
+            </span>
+            <h3 class="text-2xl sm:text-3xl font-black leading-tight banner-heading-white !text-white drop-shadow-sm" style="color: #ffffff !important;">
               Investasi Terbaik untuk Pikiran Anda
             </h3>
-            <p class="text-xs text-slate-300">
-              Hemat hingga <span class="font-bold text-white text-sm">25%</span> untuk buku psikologi, habit, dan strategi bisnis.
+            <p class="text-xs sm:text-sm banner-desc-light leading-relaxed" style="color: #f1f5f9 !important;">
+              Hemat hingga <span class="font-extrabold text-emerald-300 text-sm">25%</span> untuk buku psikologi, habit, analisis investasi, dan strategi bisnis modern.
             </p>
           </div>
           <div class="relative z-10 mt-6">
             <NuxtLink
               to="/products"
-              class="inline-flex items-center gap-1.5 bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-sm"
+              class="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md transform hover:-translate-y-0.5"
             >
               <span>Lihat Buku Bisnis</span>
               <i class="ti ti-arrow-right text-xs"></i>
@@ -279,14 +291,14 @@ const products = ref<Product[]>([])
 const isLoading = ref(true)
 const selectedCategory = ref<number>(0)
 
-// Default sample categories if DB is not seeded yet
+// Default sample categories if DB is loading
 const fallbackCategories: Category[] = [
-  { id: 1, name: 'Fiksi & Sastra', slug: 'fiksi-sastra', icon: '/assets/images/category/category-fruits-vegetables.jpg', is_active: true },
-  { id: 2, name: 'Pengembangan Diri', slug: 'self-improvement', icon: '/assets/images/category/category-dairy-bread-eggs.jpg', is_active: true },
-  { id: 3, name: 'Bisnis & Finansial', slug: 'bisnis-investasi', icon: '/assets/images/category/category-snack-munchies.jpg', is_active: true },
-  { id: 4, name: 'Teknologi & Sains', slug: 'teknologi-sains', icon: '/assets/images/category/category-bakery-biscuits.jpg', is_active: true },
-  { id: 5, name: 'Komik & Manga', slug: 'komik-manga', icon: '/assets/images/category/category-chicken-meat-fish.jpg', is_active: true },
-  { id: 6, name: 'Anak & Edukasi', slug: 'anak-edukasi', icon: '/assets/images/category/category-tea-coffee-drinks.jpg', is_active: true },
+  { id: 1, name: 'Fiksi & Sastra', slug: 'fiksi-sastra', icon: '/images/category/cat-fiksi.svg', is_active: true },
+  { id: 2, name: 'Pengembangan Diri', slug: 'self-improvement', icon: '/images/category/cat-self-improvement.svg', is_active: true },
+  { id: 3, name: 'Bisnis & Finansial', slug: 'bisnis-investasi', icon: '/images/category/cat-bisnis.svg', is_active: true },
+  { id: 4, name: 'Teknologi & Sains', slug: 'teknologi-sains', icon: '/images/category/cat-teknologi.svg', is_active: true },
+  { id: 5, name: 'Komik & Manga', slug: 'komik-manga', icon: '/images/category/cat-manga.svg', is_active: true },
+  { id: 6, name: 'Anak & Edukasi', slug: 'anak-edukasi', icon: '/images/category/cat-anak.svg', is_active: true },
 ]
 
 const displayCategories = computed(() => {
@@ -298,17 +310,36 @@ const filteredProducts = computed(() => {
   return products.value.filter(p => p.category_id === selectedCategory.value)
 })
 
+const { data: catData } = await useAsyncData('home-categories', () => 
+  api.get<Category[]>('/categories', { active: 'true' }).catch(() => null)
+)
+if (catData.value?.data && catData.value.data.length > 0) {
+  categories.value = catData.value.data
+}
+
+const { data: prodData } = await useAsyncData('home-products', () => 
+  api.get<Product[]>('/products', { limit: 10, status: 'ACTIVE' }).catch(() => null)
+)
+if (prodData.value?.data && prodData.value.data.length > 0) {
+  products.value = prodData.value.data
+  isLoading.value = false
+}
+
 onMounted(async () => {
-  try {
-    const [catRes, prodRes] = await Promise.all([
-      api.get<Category[]>('/categories', { active: 'true' }),
-      api.get<Product[]>('/products', { limit: 10, status: 'ACTIVE' }),
-    ])
-    if (catRes.data && catRes.data.length > 0) categories.value = catRes.data
-    if (prodRes.data && prodRes.data.length > 0) products.value = prodRes.data
-  } catch (err) {
-    console.error('Failed to load homepage data:', err)
-  } finally {
+  if (products.value.length === 0) {
+    try {
+      const [catRes, prodRes] = await Promise.all([
+        api.get<Category[]>('/categories', { active: 'true' }),
+        api.get<Product[]>('/products', { limit: 10, status: 'ACTIVE' }),
+      ])
+      if (catRes.data && catRes.data.length > 0) categories.value = catRes.data
+      if (prodRes.data && prodRes.data.length > 0) products.value = prodRes.data
+    } catch (err) {
+      console.error('Failed to load homepage data:', err)
+    } finally {
+      isLoading.value = false
+    }
+  } else {
     isLoading.value = false
   }
 })

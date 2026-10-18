@@ -26,10 +26,10 @@
       <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
         <i class="ti ti-package-off text-3xl"></i>
       </div>
-      <h2 class="text-xl font-bold text-gray-800">Produk tidak ditemukan</h2>
-      <p class="text-xs text-gray-500 mt-2">Produk yang Anda cari mungkin telah dinonaktifkan atau dihapus.</p>
-      <NuxtLink to="/products" class="mt-4 inline-block px-5 py-2.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 shadow-xs transition-all">
-        Kembali ke Katalog
+      <h2 class="text-xl font-bold text-gray-800">Buku tidak ditemukan</h2>
+      <p class="text-xs text-gray-500 mt-2">Buku yang Anda cari mungkin telah dinonaktifkan atau judulnya berubah.</p>
+      <NuxtLink to="/products" class="mt-4 inline-block px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-xs transition-all">
+        Kembali ke Katalog Buku
       </NuxtLink>
     </div>
 

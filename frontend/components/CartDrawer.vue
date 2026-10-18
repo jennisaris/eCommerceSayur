@@ -60,7 +60,7 @@
           >
             <!-- Product Image (Book Cover Aspect Ratio) -->
             <img
-              :src="item.product?.image || '/assets/images/products/product-img-1.jpg'"
+              :src="item.product?.image || '/images/products/book-atomic-habits.jpg'"
               alt="Book Cover"
               class="w-14 h-20 rounded-md object-cover bg-gray-50 flex-shrink-0 shadow-xs border border-gray-100"
             />
