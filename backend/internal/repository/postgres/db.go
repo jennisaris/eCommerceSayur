@@ -65,7 +65,7 @@ func RunMigrations(db *gorm.DB, migrationsDir string, runSeeder bool) error {
 			}
 
 			if err := db.Exec(string(content)).Error; err != nil {
-				log.Printf("Notice on executing migration %s: %v", entry.Name(), err)
+				return fmt.Errorf("failed executing migration %s: %w", entry.Name(), err)
 			} else {
 				log.Printf("Successfully applied migration: %s", entry.Name())
 			}

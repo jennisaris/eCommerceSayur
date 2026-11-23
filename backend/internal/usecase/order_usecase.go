@@ -41,14 +41,7 @@ func NewOrderUseCase(
 // CalculateShippingFee calculates dynamic delivery fee based on weight (100% Delivery Model)
 // Base fee: Rp 15.000 for first 1,000 grams, Rp 8.000 per additional kg
 func CalculateShippingFee(totalWeightGrams int) int64 {
-	baseFee := int64(15000)
-	if totalWeightGrams <= 1000 {
-		return baseFee
-	}
-
-	excessGrams := totalWeightGrams - 1000
-	additionalKg := (excessGrams + 999) / 1000 // ceiling division
-	return baseFee + (int64(additionalKg) * 8000)
+	return domain.CalculateShippingFee(totalWeightGrams)
 }
 
 func (u *OrderUseCase) calculateShipping(totalWeightGrams int) int64 {
@@ -171,14 +164,20 @@ func (u *OrderUseCase) CreateOrder(ctx context.Context, userID int64, req *domai
 	return order, nil
 }
 
-func (u *OrderUseCase) GetOrderByCode(ctx context.Context, userID int64, code string, isAdmin bool) (*domain.Order, error) {
+func (u *OrderUseCase) GetOrderByCode(ctx context.Context, userID int64, code string) (*domain.Order, error) {
 	order, err := u.orderRepo.GetByCodeWithDetails(ctx, code)
 	if err != nil {
 		return nil, err
 	}
 
-	if !isAdmin && order.BuyerID != userID {
-		return nil, domain.ErrForbidden
+	if order.BuyerID != userID {
+		if u.userRepo == nil {
+			return nil, domain.ErrForbidden
+		}
+		user, err := u.userRepo.GetByID(ctx, userID)
+		if err != nil || user == nil || !user.HasRole("Super Admin") {
+			return nil, domain.ErrForbidden
+		}
 	}
 
 	return order, nil

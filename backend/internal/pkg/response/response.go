@@ -1,6 +1,8 @@
 package response
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -36,6 +38,11 @@ func Created(c *fiber.Ctx, message string, data interface{}) error {
 
 func Error(c *fiber.Ctx, statusCode int, message string) error {
 	return JSON(c, statusCode, false, message, nil)
+}
+
+func Internal(c *fiber.Ctx, err error) error {
+	log.Printf("[INTERNAL_ERROR] method=%s path=%s error=%v", c.Method(), c.Path(), err)
+	return Error(c, fiber.StatusInternalServerError, "Internal server error")
 }
 
 func Paginated(c *fiber.Ctx, message string, data interface{}, page, limit int, totalItems int64) error {

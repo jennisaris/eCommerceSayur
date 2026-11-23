@@ -24,29 +24,41 @@ export const options = {
 };
 
 const BASE_URL = __ENV.API_URL || 'http://localhost:8080/api/v1';
+const CUSTOMER_EMAIL = __ENV.E2E_CUSTOMER_EMAIL;
+const CUSTOMER_PASSWORD = __ENV.E2E_CUSTOMER_PASSWORD;
+
+if (!CUSTOMER_EMAIL || !CUSTOMER_PASSWORD) {
+  throw new Error('Set E2E_CUSTOMER_EMAIL and E2E_CUSTOMER_PASSWORD before running the load test.');
+}
 
 export default function () {
-  let authToken = null;
+  let authenticated = false;
+  let csrfToken = null;
 
   // 1. Authenticate user to obtain JWT
   group('01_Authentication', function () {
     const loginPayload = JSON.stringify({
-      email: 'budi@customer.com',
-      password: 'Admin123!',
+      email: CUSTOMER_EMAIL,
+      password: CUSTOMER_PASSWORD,
     });
 
+    const csrfRes = http.get(`${BASE_URL}/auth/csrf`);
+    csrfToken = JSON.parse(csrfRes.body).data.token;
     const loginRes = http.post(`${BASE_URL}/auth/login`, loginPayload, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
     });
 
     const isLoginOk = check(loginRes, {
       'login status 200': (r) => r.status === 200,
-      'has auth token': (r) => JSON.parse(r.body).data && JSON.parse(r.body).data.token !== undefined,
+      'has authenticated user': (r) => JSON.parse(r.body).data && JSON.parse(r.body).data.user !== undefined,
     });
     errorRate.add(!isLoginOk);
 
     if (isLoginOk) {
-      authToken = JSON.parse(loginRes.body).data.token;
+      authenticated = true;
     }
   });
 
@@ -74,11 +86,11 @@ export default function () {
   sleep(0.2);
 
   // 3. Authenticated Cart & Checkout Estimation Flow
-  if (authToken) {
+  if (authenticated) {
     group('03_Cart_and_Checkout_Flow', function () {
       const authHeaders = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
+        'X-CSRF-Token': csrfToken,
       };
 
       const start = new Date();

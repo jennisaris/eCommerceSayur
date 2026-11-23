@@ -3,7 +3,7 @@
 # ==============================================================================
 
 # Stage 1: Build binary
-FROM golang:1.22-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 WORKDIR /app
 
@@ -25,8 +25,12 @@ WORKDIR /app
 RUN apk add --no-cache ca-certificates tzdata curl
 ENV TZ=Asia/Jakarta
 
-COPY --from=builder /app/bin/api /app/api
-COPY --from=builder /app/migrations /app/migrations
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+COPY --from=builder --chown=appuser:appgroup /app/bin/api /app/api
+COPY --from=builder --chown=appuser:appgroup /app/migrations /app/migrations
+
+USER appuser
 
 EXPOSE 8080
 

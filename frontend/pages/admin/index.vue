@@ -149,7 +149,7 @@ onMounted(async () => {
   try {
     const [ordersRes, prodsRes] = await Promise.all([
       api.get<Order[]>('/admin/orders', { limit: 10 }),
-      api.get<Product[]>('/products', { limit: 1, status: 'all' }),
+      api.get<Product[]>('/admin/products', { limit: 1, status: 'all' }),
     ])
 
     if (ordersRes.data) {

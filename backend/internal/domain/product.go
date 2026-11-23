@@ -53,34 +53,34 @@ type ProductFilter struct {
 }
 
 type CreateProductRequest struct {
-	CategoryID   int    `json:"category_id" validate:"required"`
-	ParentID     *int64 `json:"parent_id"`
+	CategoryID   int    `json:"category_id" validate:"required,gt=0"`
+	ParentID     *int64 `json:"parent_id" validate:"omitempty,gt=0"`
 	Name         string `json:"name" validate:"required,min=2,max=150"`
-	Slug         string `json:"slug" validate:"required,min=2,max=180"`
-	Image        string `json:"image"`
-	Description  string `json:"description"`
-	RegularPrice int64  `json:"regular_price" validate:"required,gt=0"`
-	SalePrice    int64  `json:"sale_price" validate:"gte=0"`
-	Unit         string `json:"unit"`
-	Weight       int    `json:"weight" validate:"required,gt=0"`
-	Stock        int    `json:"stock" validate:"gte=0"`
-	VariantName  string `json:"variant_name"`
+	Slug         string `json:"slug" validate:"required,min=2,max=180,slug"`
+	Image        string `json:"image" validate:"omitempty,max=1000,safe_url"`
+	Description  string `json:"description" validate:"omitempty,max=5000"`
+	RegularPrice int64  `json:"regular_price" validate:"required,gt=0,lte=1000000000"`
+	SalePrice    int64  `json:"sale_price" validate:"gte=0,lte=1000000000"`
+	Unit         string `json:"unit" validate:"omitempty,max=30"`
+	Weight       int    `json:"weight" validate:"required,gt=0,lte=100000"`
+	Stock        int    `json:"stock" validate:"gte=0,lte=1000000"`
+	VariantName  string `json:"variant_name" validate:"omitempty,max=50"`
 	Status       string `json:"status" validate:"omitempty,oneof=ACTIVE INACTIVE OUT_OF_STOCK"`
 }
 
 type UpdateProductRequest struct {
-	CategoryID   *int   `json:"category_id"`
-	ParentID     *int64 `json:"parent_id"`
+	CategoryID   *int   `json:"category_id" validate:"omitempty,gt=0"`
+	ParentID     *int64 `json:"parent_id" validate:"omitempty,gt=0"`
 	Name         string `json:"name" validate:"omitempty,min=2,max=150"`
-	Slug         string `json:"slug" validate:"omitempty,min=2,max=180"`
-	Image        string `json:"image"`
-	Description  string `json:"description"`
-	RegularPrice *int64 `json:"regular_price" validate:"omitempty,gt=0"`
-	SalePrice    *int64 `json:"sale_price" validate:"omitempty,gte=0"`
-	Unit         string `json:"unit"`
-	Weight       *int   `json:"weight" validate:"omitempty,gt=0"`
-	Stock        *int   `json:"stock" validate:"omitempty,gte=0"`
-	VariantName  string `json:"variant_name"`
+	Slug         string `json:"slug" validate:"omitempty,min=2,max=180,slug"`
+	Image        string `json:"image" validate:"omitempty,max=1000,safe_url"`
+	Description  string `json:"description" validate:"omitempty,max=5000"`
+	RegularPrice *int64 `json:"regular_price" validate:"omitempty,gt=0,lte=1000000000"`
+	SalePrice    *int64 `json:"sale_price" validate:"omitempty,gte=0,lte=1000000000"`
+	Unit         string `json:"unit" validate:"omitempty,max=30"`
+	Weight       *int   `json:"weight" validate:"omitempty,gt=0,lte=100000"`
+	Stock        *int   `json:"stock" validate:"omitempty,gte=0,lte=1000000"`
+	VariantName  string `json:"variant_name" validate:"omitempty,max=50"`
 	Status       string `json:"status" validate:"omitempty,oneof=ACTIVE INACTIVE OUT_OF_STOCK"`
 }
 

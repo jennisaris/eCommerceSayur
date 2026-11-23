@@ -231,8 +231,8 @@
                 class="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500"
               />
               <img
-                v-if="form.image"
-                :src="form.image"
+                v-if="toSafeAssetUrl(form.image)"
+                :src="toSafeAssetUrl(form.image)"
                 alt="Preview"
                 class="w-9 h-9 rounded-lg object-cover bg-slate-100 border border-slate-200 flex-shrink-0"
                 @error="(e: any) => e.target.style.display = 'none'"
@@ -304,7 +304,7 @@ const form = reactive({
 
 const fetchCategories = async () => {
   try {
-    const res = await api.get<Category[]>('/categories')
+    const res = await api.get<Category[]>('/admin/categories')
     if (res.data) categories.value = res.data
   } catch (err) {
     console.error('Failed to load categories:', err)
@@ -314,7 +314,7 @@ const fetchCategories = async () => {
 const fetchProducts = async () => {
   isLoading.value = true
   try {
-    const res = await api.get<Product[]>('/products', { limit: 100, status: 'all' })
+    const res = await api.get<Product[]>('/admin/products', { limit: 100, status: 'all' })
     if (res.data) products.value = res.data
   } catch (err) {
     console.error('Failed to load products:', err)

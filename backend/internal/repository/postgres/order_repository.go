@@ -28,6 +28,7 @@ func NewOrderRepository(db *gorm.DB) domain.OrderRepository {
 func (r *OrderRepository) CreateWithItems(ctx context.Context, order *domain.Order, items []domain.OrderItem) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var calculatedSubtotal int64 = 0
+		totalWeightGrams := 0
 
 		for i := range items {
 			var product domain.Product
@@ -60,7 +61,7 @@ func (r *OrderRepository) CreateWithItems(ctx context.Context, order *domain.Ord
 				return fmt.Errorf("failed updating product stock: %w", err)
 			}
 
-			// CRITICAL RULE 3: Exact price snapshotting
+			// CRITICAL RULE 3: Exact price & weight calculation from locked DB rows
 			itemPrice := product.EffectivePrice()
 			itemSubtotal := itemPrice * int64(items[i].Quantity)
 
@@ -69,9 +70,11 @@ func (r *OrderRepository) CreateWithItems(ctx context.Context, order *domain.Ord
 			items[i].Subtotal = itemSubtotal
 
 			calculatedSubtotal += itemSubtotal
+			totalWeightGrams += product.Weight * items[i].Quantity
 		}
 
-		// Calculate total invoice
+		// Calculate shipping fee & total invoice atomically from locked product weights/prices
+		order.ShippingFee = domain.CalculateShippingFee(totalWeightGrams)
 		order.TotalAmount = calculatedSubtotal + order.ShippingFee
 
 		// Insert order
@@ -175,8 +178,8 @@ func (r *OrderRepository) GetAll(ctx context.Context, filter domain.OrderFilter)
 	}
 
 	if filter.Search != "" {
-		term := "%" + filter.Search + "%"
-		query = query.Where("order_code ILIKE ? OR recipient_name ILIKE ? OR recipient_phone ILIKE ?", term, term, term)
+		term := escapeLikePattern(filter.Search)
+		query = query.Where(`order_code ILIKE ? ESCAPE '\' OR recipient_name ILIKE ? ESCAPE '\' OR recipient_phone ILIKE ? ESCAPE '\'`, term, term, term)
 	}
 
 	if err := query.Count(&total).Error; err != nil {
@@ -218,6 +221,14 @@ func (r *OrderRepository) UpdateStatus(ctx context.Context, id int64, status str
 // RestockCancelledOrder restores product stock if an order expires, cancels, or fails
 func (r *OrderRepository) RestockCancelledOrder(ctx context.Context, orderID int64) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var order domain.Order
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&order, orderID).Error; err != nil {
+			return err
+		}
+		if order.Status == string(domain.OrderStatusCancelled) {
+			return nil
+		}
+
 		var items []domain.OrderItem
 		if err := tx.Where("order_id = ?", orderID).Find(&items).Error; err != nil {
 			return err

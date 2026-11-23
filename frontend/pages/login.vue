@@ -19,29 +19,6 @@
           </p>
         </div>
 
-        <!-- Quick Demo Login Buttons -->
-        <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
-          <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block text-center">Akun Uji Coba Cepat (Demo Fill)</span>
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              @click="fillAdmin"
-              type="button"
-              class="px-2.5 py-1.5 text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded-lg transition-colors flex items-center justify-center gap-1"
-            >
-              <i class="ti ti-shield-lock text-xs"></i>
-              <span>Super Admin</span>
-            </button>
-            <button
-              @click="fillCustomer"
-              type="button"
-              class="px-2.5 py-1.5 text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 rounded-lg transition-colors flex items-center justify-center gap-1"
-            >
-              <i class="ti ti-user text-xs"></i>
-              <span>Customer</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Error Alert -->
         <div v-if="errorMessage" class="p-3 bg-red-50 text-red-700 border border-red-200 text-xs rounded-xl font-medium flex items-center gap-2">
           <i class="ti ti-alert-triangle text-base"></i>
@@ -67,7 +44,7 @@
           <div>
             <div class="flex items-center justify-between mb-1.5">
               <label class="block text-xs font-bold text-gray-700">Kata Sandi</label>
-              <span class="text-[11px] text-indigo-600 hover:underline cursor-pointer">Lupa Password?</span>
+              <NuxtLink to="/forgot-password" class="text-[11px] text-indigo-600 hover:underline">Lupa Password?</NuxtLink>
             </div>
             <div class="relative">
               <input
@@ -118,18 +95,6 @@ const password = ref('')
 const showPassword = ref(false)
 const isLoading = ref(false)
 const errorMessage = ref('')
-
-const fillAdmin = () => {
-  email.value = 'admin@ecommerce.com'
-  password.value = 'Admin123!'
-  errorMessage.value = ''
-}
-
-const fillCustomer = () => {
-  email.value = 'budi@customer.com'
-  password.value = 'Admin123!'
-  errorMessage.value = ''
-}
 
 const handleLogin = async () => {
   isLoading.value = true

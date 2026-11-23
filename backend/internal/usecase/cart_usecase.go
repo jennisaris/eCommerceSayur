@@ -81,14 +81,24 @@ func (u *CartUseCase) AddToCart(ctx context.Context, userID int64, req *domain.A
 		return nil, domain.ErrProductInactive
 	}
 
-	if product.Stock < req.Quantity {
-		return nil, fmt.Errorf("requested quantity (%d) exceeds available stock (%d): %w",
-			req.Quantity, product.Stock, domain.ErrInsufficientStock)
-	}
-
 	cart, err := u.cartRepo.GetByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
+	}
+
+	existingQty := 0
+	for _, existing := range cart.Items {
+		if existing.ProductID == req.ProductID {
+			existingQty += existing.Quantity
+		}
+	}
+	totalRequested := existingQty + req.Quantity
+	if totalRequested > 1000 {
+		return nil, fmt.Errorf("maximum cart quantity per product is 1000: %w", domain.ErrInvalidInput)
+	}
+	if product.Stock < totalRequested {
+		return nil, fmt.Errorf("requested quantity (%d) exceeds available stock (%d): %w",
+			totalRequested, product.Stock, domain.ErrInsufficientStock)
 	}
 
 	item := &domain.CartItem{

@@ -4,6 +4,7 @@ import (
 	"context"
 	"ecommerce-backend/internal/domain"
 	redisrepo "ecommerce-backend/internal/repository/redis"
+	"fmt"
 	"time"
 )
 
@@ -26,6 +27,10 @@ func NewProductUseCase(
 }
 
 func (u *ProductUseCase) Create(ctx context.Context, req *domain.CreateProductRequest) (*domain.Product, error) {
+	if req.SalePrice > 0 && req.SalePrice > req.RegularPrice {
+		return nil, fmt.Errorf("harga diskon tidak boleh melebihi harga normal: %w", domain.ErrInvalidInput)
+	}
+
 	// Validate category exists
 	if _, err := u.categoryRepo.GetByID(ctx, req.CategoryID); err != nil {
 		return nil, err
@@ -148,6 +153,9 @@ func (u *ProductUseCase) Update(ctx context.Context, id int64, req *domain.Updat
 	}
 	if req.SalePrice != nil {
 		product.SalePrice = *req.SalePrice
+	}
+	if product.SalePrice > 0 && product.SalePrice > product.RegularPrice {
+		return nil, fmt.Errorf("harga diskon tidak boleh melebihi harga normal: %w", domain.ErrInvalidInput)
 	}
 	if req.Unit != "" {
 		product.Unit = req.Unit

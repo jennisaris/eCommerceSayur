@@ -3,8 +3,10 @@ package handler
 import (
 	"ecommerce-backend/internal/domain"
 	"ecommerce-backend/internal/pkg/response"
+	pkgvalidate "ecommerce-backend/internal/pkg/validate"
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -18,44 +20,71 @@ type ProductHandler struct {
 func NewProductHandler(productUseCase domain.ProductUseCase) *ProductHandler {
 	return &ProductHandler{
 		productUseCase: productUseCase,
-		validate:       validator.New(),
+		validate:       pkgvalidate.New(),
 	}
 }
 
-func (h *ProductHandler) GetAll(c *fiber.Ctx) error {
-	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", "20"))
-	search := c.Query("search", "")
-	status := c.Query("status", "ACTIVE") // Default to ACTIVE for public store
-	sort := c.Query("sort", "latest")
+func parseProductFilter(c *fiber.Ctx, allowInactive bool) (domain.ProductFilter, int, int, error) {
+	page, limit := parsePagination(c)
+	search := strings.TrimSpace(c.Query("search", ""))
+	if len(search) > 100 {
+		search = search[:100]
+	}
+
+	status := "ACTIVE"
+	if allowInactive {
+		rawStatus := strings.TrimSpace(c.Query("status", ""))
+		switch rawStatus {
+		case "", "all":
+			status = ""
+		case "ACTIVE", "INACTIVE", "OUT_OF_STOCK":
+			status = rawStatus
+		default:
+			return domain.ProductFilter{}, 0, 0, errors.New("Invalid product status filter")
+		}
+	}
+
+	sort := strings.TrimSpace(c.Query("sort", "latest"))
+	switch sort {
+	case "", "latest", "price_asc", "price_desc":
+		if sort == "" {
+			sort = "latest"
+		}
+	default:
+		return domain.ProductFilter{}, 0, 0, errors.New("Invalid sort parameter")
+	}
 
 	var categoryID *int
-	if catStr := c.Query("category_id"); catStr != "" {
-		if id, err := strconv.Atoi(catStr); err == nil && id > 0 {
-			categoryID = &id
+	if catStr := strings.TrimSpace(c.Query("category_id")); catStr != "" {
+		id, err := strconv.Atoi(catStr)
+		if err != nil || id <= 0 {
+			return domain.ProductFilter{}, 0, 0, errors.New("Invalid category_id parameter")
 		}
+		categoryID = &id
 	}
 
 	var minPrice *int64
-	if minStr := c.Query("min_price"); minStr != "" {
-		if val, err := strconv.ParseInt(minStr, 10, 64); err == nil {
-			minPrice = &val
+	if minStr := strings.TrimSpace(c.Query("min_price")); minStr != "" {
+		val, err := strconv.ParseInt(minStr, 10, 64)
+		if err != nil || val < 0 {
+			return domain.ProductFilter{}, 0, 0, errors.New("Invalid min_price parameter")
 		}
+		minPrice = &val
 	}
 
 	var maxPrice *int64
-	if maxStr := c.Query("max_price"); maxStr != "" {
-		if val, err := strconv.ParseInt(maxStr, 10, 64); err == nil {
-			maxPrice = &val
+	if maxStr := strings.TrimSpace(c.Query("max_price")); maxStr != "" {
+		val, err := strconv.ParseInt(maxStr, 10, 64)
+		if err != nil || val < 0 {
+			return domain.ProductFilter{}, 0, 0, errors.New("Invalid max_price parameter")
 		}
+		maxPrice = &val
+	}
+	if minPrice != nil && maxPrice != nil && *minPrice > *maxPrice {
+		return domain.ProductFilter{}, 0, 0, errors.New("min_price cannot exceed max_price")
 	}
 
-	// Admin can pass status="all" to see all products including inactive
-	if c.Query("status") == "all" {
-		status = ""
-	}
-
-	filter := domain.ProductFilter{
+	return domain.ProductFilter{
 		CategoryID: categoryID,
 		Search:     search,
 		Status:     status,
@@ -64,24 +93,51 @@ func (h *ProductHandler) GetAll(c *fiber.Ctx) error {
 		Page:       page,
 		Limit:      limit,
 		Sort:       sort,
+	}, page, limit, nil
+}
+
+func (h *ProductHandler) GetAll(c *fiber.Ctx) error {
+	filter, page, limit, err := parseProductFilter(c, false)
+	if err != nil {
+		return response.Error(c, fiber.StatusBadRequest, err.Error())
 	}
 
 	products, total, err := h.productUseCase.GetAll(c.Context(), filter)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, err.Error())
+		return response.Internal(c, err)
+	}
+
+	return response.Paginated(c, "Products retrieved successfully", products, page, limit, total)
+}
+
+func (h *ProductHandler) AdminGetAll(c *fiber.Ctx) error {
+	filter, page, limit, err := parseProductFilter(c, true)
+	if err != nil {
+		return response.Error(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	products, total, err := h.productUseCase.GetAll(c.Context(), filter)
+	if err != nil {
+		return response.Internal(c, err)
 	}
 
 	return response.Paginated(c, "Products retrieved successfully", products, page, limit, total)
 }
 
 func (h *ProductHandler) GetBySlug(c *fiber.Ctx) error {
-	slug := c.Params("slug")
+	slug := strings.TrimSpace(c.Params("slug"))
+	if slug == "" || len(slug) > 180 {
+		return response.Error(c, fiber.StatusBadRequest, "Invalid product slug")
+	}
 	product, err := h.productUseCase.GetBySlug(c.Context(), slug)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return response.Error(c, fiber.StatusNotFound, "Product not found")
 		}
-		return response.Error(c, fiber.StatusInternalServerError, err.Error())
+		return response.Internal(c, err)
+	}
+	if product.Status == "INACTIVE" {
+		return response.Error(c, fiber.StatusNotFound, "Product not found")
 	}
 	return response.Success(c, "Product details retrieved successfully", product)
 }
@@ -93,12 +149,15 @@ func (h *ProductHandler) Create(c *fiber.Ctx) error {
 	}
 
 	if err := h.validate.Struct(&req); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, err.Error())
+		return response.Error(c, fiber.StatusBadRequest, pkgvalidate.FormatError(err))
 	}
 
 	product, err := h.productUseCase.Create(c.Context(), &req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, err.Error())
+		if errors.Is(err, domain.ErrInvalidInput) || errors.Is(err, domain.ErrNotFound) {
+			return response.Error(c, fiber.StatusBadRequest, err.Error())
+		}
+		return response.Internal(c, err)
 	}
 
 	return response.Created(c, "Product created successfully", product)
@@ -106,7 +165,7 @@ func (h *ProductHandler) Create(c *fiber.Ctx) error {
 
 func (h *ProductHandler) Update(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
-	if err != nil {
+	if err != nil || id <= 0 {
 		return response.Error(c, fiber.StatusBadRequest, "Invalid product ID")
 	}
 
@@ -116,7 +175,7 @@ func (h *ProductHandler) Update(c *fiber.Ctx) error {
 	}
 
 	if err := h.validate.Struct(&req); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, err.Error())
+		return response.Error(c, fiber.StatusBadRequest, pkgvalidate.FormatError(err))
 	}
 
 	product, err := h.productUseCase.Update(c.Context(), id, &req)
@@ -124,7 +183,10 @@ func (h *ProductHandler) Update(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return response.Error(c, fiber.StatusNotFound, "Product not found")
 		}
-		return response.Error(c, fiber.StatusInternalServerError, err.Error())
+		if errors.Is(err, domain.ErrInvalidInput) {
+			return response.Error(c, fiber.StatusBadRequest, err.Error())
+		}
+		return response.Internal(c, err)
 	}
 
 	return response.Success(c, "Product updated successfully", product)
@@ -132,12 +194,12 @@ func (h *ProductHandler) Update(c *fiber.Ctx) error {
 
 func (h *ProductHandler) Delete(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
-	if err != nil {
+	if err != nil || id <= 0 {
 		return response.Error(c, fiber.StatusBadRequest, "Invalid product ID")
 	}
 
 	if err := h.productUseCase.Delete(c.Context(), id); err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, err.Error())
+		return response.Internal(c, err)
 	}
 
 	return response.Success(c, "Product deleted successfully", nil)

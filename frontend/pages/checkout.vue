@@ -261,22 +261,30 @@ const handleCheckout = async () => {
       throw new Error('Gagal memproses pesanan')
     }
 
+    // Order is created and DB cart is cleared; sync cart immediately so UI never stays stale
+    await cartStore.fetchCart()
+
     // 2. Request Midtrans Snap Token
-    const snapRes = await api.post<{ snap_token: string; redirect_url: string }>(
-      '/payments/snap',
-      { order_code: createdOrder.order_code }
-    )
+    let snapRes: { data?: { snap_token: string; redirect_url: string } }
+    try {
+      snapRes = await api.post<{ snap_token: string; redirect_url: string }>(
+        '/payments/snap',
+        { order_code: createdOrder.order_code }
+      )
+    } catch (snapErr: any) {
+      alert(snapErr.message || 'Pesanan sudah dibuat, tetapi gagal memuat Midtrans. Silakan lanjutkan pembayaran dari halaman pesanan.')
+      router.push(`/orders/${createdOrder.order_code}`)
+      return
+    }
 
     const snapToken = snapRes.data?.snap_token
 
     if (!snapToken) {
-      throw new Error('Token pembayaran Midtrans tidak valid')
+      router.push(`/orders/${createdOrder.order_code}`)
+      return
     }
 
-    // 3. Clear cart store on client
-    await cartStore.fetchCart()
-
-    // 4. Trigger Midtrans Snap.js Modal Popup
+    // 3. Trigger Midtrans Snap.js Modal Popup
     if (typeof window !== 'undefined' && window.snap) {
       window.snap.pay(snapToken, {
         onSuccess: (result: any) => {
@@ -297,7 +305,7 @@ const handleCheckout = async () => {
       })
     } else {
       // Fallback: Redirect to Midtrans Redirect URL if Snap JS not loaded
-      if (snapRes.data?.redirect_url) {
+      if (snapRes.data?.redirect_url && isAllowedMidtransUrl(snapRes.data.redirect_url)) {
         window.location.href = snapRes.data.redirect_url
       } else {
         router.push(`/orders/${createdOrder.order_code}`)

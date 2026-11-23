@@ -32,12 +32,12 @@ func (CartItem) TableName() string {
 }
 
 type AddToCartRequest struct {
-	ProductID int64 `json:"product_id" validate:"required"`
-	Quantity  int   `json:"quantity" validate:"required,min=1"`
+	ProductID int64 `json:"product_id" validate:"required,gt=0"`
+	Quantity  int   `json:"quantity" validate:"required,min=1,max=1000"`
 }
 
 type UpdateCartItemRequest struct {
-	Quantity int `json:"quantity" validate:"gte=0"`
+	Quantity int `json:"quantity" validate:"gte=0,lte=1000"`
 }
 
 type CartSummaryResponse struct {

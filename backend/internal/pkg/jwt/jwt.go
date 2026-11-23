@@ -15,14 +15,18 @@ type CustomClaims struct {
 }
 
 type JWTService struct {
-	secretKey       []byte
-	expirationHours int
+	secretKey  []byte
+	expiration time.Duration
 }
 
 func NewJWTService(secret string, hours int) *JWTService {
+	return NewJWTServiceWithDuration(secret, time.Duration(hours)*time.Hour)
+}
+
+func NewJWTServiceWithDuration(secret string, expiration time.Duration) *JWTService {
 	return &JWTService{
-		secretKey:       []byte(secret),
-		expirationHours: hours,
+		secretKey:  []byte(secret),
+		expiration: expiration,
 	}
 }
 
@@ -32,7 +36,7 @@ func (j *JWTService) GenerateToken(userID int64, email string, roles []string) (
 		Email:  email,
 		Roles:  roles,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(j.expirationHours) * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.expiration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "ecommerce-api",

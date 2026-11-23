@@ -3,6 +3,7 @@ package midtrans
 import (
 	"bytes"
 	"crypto/sha512"
+	"crypto/subtle"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -10,14 +11,19 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 )
 
+var ErrTransactionNotFound = errors.New("midtrans transaction not found")
+
 type Client struct {
-	serverKey    string
-	clientKey    string
-	isProduction bool
-	httpClient   *http.Client
+	serverKey     string
+	clientKey     string
+	isProduction  bool
+	apiBaseURL    string
+	httpClient    *http.Client
 }
 
 func NewClient(serverKey, clientKey string, isProduction bool) *Client {
@@ -31,11 +37,26 @@ func NewClient(serverKey, clientKey string, isProduction bool) *Client {
 	}
 }
 
+// SetAPIBaseURL overrides the Midtrans Core API base URL (used in tests).
+func (c *Client) SetAPIBaseURL(baseURL string) {
+	c.apiBaseURL = strings.TrimRight(baseURL, "/")
+}
+
 func (c *Client) getBaseURL() string {
 	if c.isProduction {
 		return "https://app.midtrans.com"
 	}
 	return "https://app.sandbox.midtrans.com"
+}
+
+func (c *Client) getAPIBaseURL() string {
+	if c.apiBaseURL != "" {
+		return c.apiBaseURL
+	}
+	if c.isProduction {
+		return "https://api.midtrans.com"
+	}
+	return "https://api.sandbox.midtrans.com"
 }
 
 type SnapTransactionDetails struct {
@@ -124,11 +145,60 @@ func (c *Client) CreateSnapTransaction(req *CreateSnapRequest) (*CreateSnapRespo
 	return &snapResp, nil
 }
 
-// VerifySignature validates SHA-512 signature from Midtrans callback:
+// GetTransactionStatus queries Midtrans Core API v2/{order_id}/status server-to-server using ServerKey.
+func (c *Client) GetTransactionStatus(orderID string) ([]byte, error) {
+	if strings.TrimSpace(c.serverKey) == "" {
+		return nil, errors.New("midtrans server key is not configured")
+	}
+	endpoint := fmt.Sprintf("%s/v2/%s/status", c.getAPIBaseURL(), url.PathEscape(orderID))
+	httpReq, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create status request: %w", err)
+	}
+	authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(c.serverKey+":"))
+	httpReq.Header.Set("Authorization", authHeader)
+	httpReq.Header.Set("Accept", "application/json")
+
+	resp, err := c.httpClient.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("midtrans status request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read midtrans status response: %w", err)
+	}
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, ErrTransactionNotFound
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("midtrans status error (status %d): %s", resp.StatusCode, string(respBody))
+	}
+
+	// Midtrans sometimes returns HTTP 200 with {"status_code":"404",...} when transaction does not exist yet
+	var probe struct {
+		StatusCode string `json:"status_code"`
+	}
+	if json.Unmarshal(respBody, &probe) == nil && probe.StatusCode == "404" {
+		return nil, ErrTransactionNotFound
+	}
+
+	return respBody, nil
+}
+
+// VerifySignature validates SHA-512 signature from Midtrans callback using constant-time comparison:
 // SHA512(order_id + status_code + gross_amount + ServerKey)
 func (c *Client) VerifySignature(orderID, statusCode, grossAmount, incomingSignature string) bool {
+	if strings.TrimSpace(c.serverKey) == "" || strings.TrimSpace(incomingSignature) == "" {
+		return false
+	}
 	raw := orderID + statusCode + grossAmount + c.serverKey
 	hash := sha512.Sum512([]byte(raw))
 	expected := hex.EncodeToString(hash[:])
-	return expected == incomingSignature
+	candidate := strings.ToLower(strings.TrimSpace(incomingSignature))
+	if len(expected) != len(candidate) {
+		return false
+	}
+	return subtle.ConstantTimeCompare([]byte(expected), []byte(candidate)) == 1
 }

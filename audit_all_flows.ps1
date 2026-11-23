@@ -6,25 +6,46 @@ Write-Host "==========================================================" -Foregro
 
 $baseUrl = "http://127.0.0.1:8080/api/v1"
 
+function Get-CsrfHeaders {
+    param([Microsoft.PowerShell.Commands.WebRequestSession]$Session)
+    $csrf = Invoke-RestMethod -Uri "$baseUrl/auth/csrf" -Method Get -WebSession $Session
+    return @{
+        "X-CSRF-Token" = $csrf.data.token
+        "Content-Type" = "application/json"
+    }
+}
+
 # -----------------------------------------------------------------------------
 # 1. AUTHENTICATION AUDIT
 # -----------------------------------------------------------------------------
 Write-Host "`n[1/5] AUDITING AUTH FLOW..." -ForegroundColor Yellow
 
 # Admin Login
-$adminLogin = Invoke-RestMethod -Uri "$baseUrl/auth/login" -Method Post -Body (@{ email = "admin@ecommerce.com"; password = "Admin123!" } | ConvertTo-Json) -ContentType "application/json"
-$adminToken = $adminLogin.data.token
-if ($adminToken) {
-    Write-Host "  [OK] Admin Login successful (Token received)" -ForegroundColor Green
+$adminEmail = $env:E2E_ADMIN_EMAIL
+$adminPassword = $env:E2E_ADMIN_PASSWORD
+if ([string]::IsNullOrWhiteSpace($adminEmail) -or [string]::IsNullOrWhiteSpace($adminPassword)) {
+    throw "Set E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD before running this audit."
+}
+$adminSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$adminHeaders = Get-CsrfHeaders $adminSession
+$adminLogin = Invoke-RestMethod -Uri "$baseUrl/auth/login" -Method Post -WebSession $adminSession -Headers $adminHeaders -Body (@{ email = $adminEmail; password = $adminPassword } | ConvertTo-Json)
+if ($adminLogin.data.user) {
+    Write-Host "  [OK] Admin Login successful (HttpOnly session received)" -ForegroundColor Green
 } else {
     throw "Admin login failed"
 }
 
 # Customer Login
-$custLogin = Invoke-RestMethod -Uri "$baseUrl/auth/login" -Method Post -Body (@{ email = "budi@customer.com"; password = "Admin123!" } | ConvertTo-Json) -ContentType "application/json"
-$custToken = $custLogin.data.token
-if ($custToken) {
-    Write-Host "  [OK] Customer Login successful (Token received)" -ForegroundColor Green
+$custEmail = $env:E2E_CUSTOMER_EMAIL
+$custPassword = $env:E2E_CUSTOMER_PASSWORD
+if ([string]::IsNullOrWhiteSpace($custEmail) -or [string]::IsNullOrWhiteSpace($custPassword)) {
+    throw "Set E2E_CUSTOMER_EMAIL and E2E_CUSTOMER_PASSWORD before running this audit."
+}
+$custSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$custHeaders = Get-CsrfHeaders $custSession
+$custLogin = Invoke-RestMethod -Uri "$baseUrl/auth/login" -Method Post -WebSession $custSession -Headers $custHeaders -Body (@{ email = $custEmail; password = $custPassword } | ConvertTo-Json)
+if ($custLogin.data.user) {
+    Write-Host "  [OK] Customer Login successful (HttpOnly session received)" -ForegroundColor Green
 } else {
     throw "Customer login failed"
 }
@@ -32,16 +53,17 @@ if ($custToken) {
 # Register New User & Get Profile
 $rand = Get-Random -Minimum 10000 -Maximum 99999
 $newUserEmail = "audit_user_$rand@test.com"
-$regRes = Invoke-RestMethod -Uri "$baseUrl/auth/register" -Method Post -Body (@{
+$newUserSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$newUserHeaders = Get-CsrfHeaders $newUserSession
+$regRes = Invoke-RestMethod -Uri "$baseUrl/auth/register" -Method Post -WebSession $newUserSession -Headers $newUserHeaders -Body (@{
     name = "Audit Test User $rand"
     email = $newUserEmail
     password = "Password123!"
     phone = "081298765432"
     address = "Jl. Sudirman Kav 21, Jakarta"
-} | ConvertTo-Json) -ContentType "application/json"
-$newUsertoken = $regRes.data.token
+} | ConvertTo-Json)
 
-$meRes = Invoke-RestMethod -Uri "$baseUrl/auth/me" -Method Get -Headers @{ Authorization = "Bearer $newUsertoken" }
+$meRes = Invoke-RestMethod -Uri "$baseUrl/auth/me" -Method Get -WebSession $newUserSession
 if ($meRes.data.email -eq $newUserEmail) {
     Write-Host "  [OK] Register and /auth/me profile verified" -ForegroundColor Green
 } else {
@@ -55,7 +77,7 @@ Write-Host "`n[2/5] AUDITING CATEGORY CRUD (ADD, EDIT, REMOVE)..." -ForegroundCo
 
 # ADD Category
 $catSlug = "audit-cat-$rand"
-$addCat = Invoke-RestMethod -Uri "$baseUrl/admin/categories" -Method Post -Headers @{ Authorization = "Bearer $adminToken" } -Body (@{
+$addCat = Invoke-RestMethod -Uri "$baseUrl/admin/categories" -Method Post -WebSession $adminSession -Headers $adminHeaders -Body (@{
     name = "Audit Category $rand"
     slug = $catSlug
     icon = "/assets/images/category/category-fruits-vegetables.jpg"
@@ -66,7 +88,7 @@ $catId = $addCat.data.id
 Write-Host "  [OK] ADD Category: ID = $catId, Name = '$($addCat.data.name)'" -ForegroundColor Green
 
 # EDIT Category
-$editCat = Invoke-RestMethod -Uri "$baseUrl/admin/categories/$catId" -Method Put -Headers @{ Authorization = "Bearer $adminToken" } -Body (@{
+$editCat = Invoke-RestMethod -Uri "$baseUrl/admin/categories/$catId" -Method Put -WebSession $adminSession -Headers $adminHeaders -Body (@{
     name = "Audit Category Updated $rand"
     description = "Updated description"
 } | ConvertTo-Json) -ContentType "application/json"
@@ -77,7 +99,7 @@ if ($editCat.data.name -eq "Audit Category Updated $rand") {
 }
 
 # REMOVE Category
-$delCat = Invoke-RestMethod -Uri "$baseUrl/admin/categories/$catId" -Method Delete -Headers @{ Authorization = "Bearer $adminToken" }
+$delCat = Invoke-RestMethod -Uri "$baseUrl/admin/categories/$catId" -Method Delete -WebSession $adminSession -Headers $adminHeaders
 Write-Host "  [OK] REMOVE Category: $($delCat.message)" -ForegroundColor Green
 
 # -----------------------------------------------------------------------------
@@ -87,7 +109,7 @@ Write-Host "`n[3/5] AUDITING PRODUCT CRUD (ADD, EDIT, REMOVE)..." -ForegroundCol
 
 # ADD Product
 $prodSlug = "audit-prod-$rand"
-$addProd = Invoke-RestMethod -Uri "$baseUrl/admin/products" -Method Post -Headers @{ Authorization = "Bearer $adminToken" } -Body (@{
+$addProd = Invoke-RestMethod -Uri "$baseUrl/admin/products" -Method Post -WebSession $adminSession -Headers $adminHeaders -Body (@{
     category_id = 1
     name = "Audit Fresh Sayur $rand"
     slug = $prodSlug
@@ -105,7 +127,7 @@ $prodId = $addProd.data.id
 Write-Host "  [OK] ADD Product: ID = $prodId, Name = '$($addProd.data.name)', Stock = $($addProd.data.stock)" -ForegroundColor Green
 
 # EDIT Product
-$editProd = Invoke-RestMethod -Uri "$baseUrl/admin/products/$prodId" -Method Put -Headers @{ Authorization = "Bearer $adminToken" } -Body (@{
+$editProd = Invoke-RestMethod -Uri "$baseUrl/admin/products/$prodId" -Method Put -WebSession $adminSession -Headers $adminHeaders -Body (@{
     name = "Audit Fresh Sayur $rand (Updated)"
     regular_price = 28000
     sale_price = 22000
@@ -119,7 +141,7 @@ if ($editProd.data.regular_price -eq 28000 -and $editProd.data.stock -eq 45) {
 }
 
 # REMOVE Product
-$delProd = Invoke-RestMethod -Uri "$baseUrl/admin/products/$prodId" -Method Delete -Headers @{ Authorization = "Bearer $adminToken" }
+$delProd = Invoke-RestMethod -Uri "$baseUrl/admin/products/$prodId" -Method Delete -WebSession $adminSession -Headers $adminHeaders
 Write-Host "  [OK] REMOVE Product: $($delProd.message)" -ForegroundColor Green
 
 # -----------------------------------------------------------------------------
@@ -128,31 +150,31 @@ Write-Host "  [OK] REMOVE Product: $($delProd.message)" -ForegroundColor Green
 Write-Host "`n[4/5] AUDITING CART FLOW (ADD, EDIT QUANTITY, REMOVE)..." -ForegroundColor Yellow
 
 # Clear Cart first
-Invoke-RestMethod -Uri "$baseUrl/cart" -Method Delete -Headers @{ Authorization = "Bearer $custToken" } | Out-Null
+Invoke-RestMethod -Uri "$baseUrl/cart" -Method Delete -WebSession $custSession -Headers $custHeaders | Out-Null
 Write-Host "  [OK] CLEAR Cart initialized" -ForegroundColor Green
 
 # ADD to Cart (Product ID 1, Qty 3)
-$cartAdd = Invoke-RestMethod -Uri "$baseUrl/cart/items" -Method Post -Headers @{ Authorization = "Bearer $custToken" } -Body (@{
+$cartAdd = Invoke-RestMethod -Uri "$baseUrl/cart/items" -Method Post -WebSession $custSession -Headers $custHeaders -Body (@{
     product_id = 1
     quantity = 3
 } | ConvertTo-Json) -ContentType "application/json"
 Write-Host "  [OK] ADD to Cart: Total Items = $($cartAdd.data.total_items), Subtotal = $($cartAdd.data.total_price), Weight = $($cartAdd.data.total_weight)g" -ForegroundColor Green
 
 # EDIT Cart Item Quantity (Change Qty to 5)
-$cartEdit = Invoke-RestMethod -Uri "$baseUrl/cart/items/1" -Method Put -Headers @{ Authorization = "Bearer $custToken" } -Body (@{
+$cartEdit = Invoke-RestMethod -Uri "$baseUrl/cart/items/1" -Method Put -WebSession $custSession -Headers $custHeaders -Body (@{
     quantity = 5
 } | ConvertTo-Json) -ContentType "application/json"
 Write-Host "  [OK] EDIT Cart Item (Qty -> 5): Total Items = $($cartEdit.data.total_items), Subtotal = $($cartEdit.data.total_price)" -ForegroundColor Green
 
 # EDIT Cart Item Quantity to 0 (Should remove cleanly)
-$cartZero = Invoke-RestMethod -Uri "$baseUrl/cart/items/1" -Method Put -Headers @{ Authorization = "Bearer $custToken" } -Body (@{
+$cartZero = Invoke-RestMethod -Uri "$baseUrl/cart/items/1" -Method Put -WebSession $custSession -Headers $custHeaders -Body (@{
     quantity = 0
 } | ConvertTo-Json) -ContentType "application/json"
 Write-Host "  [OK] EDIT Cart Item (Qty -> 0): Total Items = $($cartZero.data.total_items) (Clean auto-removal)" -ForegroundColor Green
 
 # ADD 2 items for removal test
-Invoke-RestMethod -Uri "$baseUrl/cart/items" -Method Post -Headers @{ Authorization = "Bearer $custToken" } -Body (@{ product_id = 1; quantity = 2 } | ConvertTo-Json) -ContentType "application/json" | Out-Null
-$cartRemove = Invoke-RestMethod -Uri "$baseUrl/cart/items/1" -Method Delete -Headers @{ Authorization = "Bearer $custToken" }
+Invoke-RestMethod -Uri "$baseUrl/cart/items" -Method Post -WebSession $custSession -Headers $custHeaders -Body (@{ product_id = 1; quantity = 2 } | ConvertTo-Json) | Out-Null
+$cartRemove = Invoke-RestMethod -Uri "$baseUrl/cart/items/1" -Method Delete -WebSession $custSession -Headers $custHeaders
 Write-Host "  [OK] REMOVE Cart Item: Total Items = $($cartRemove.data.total_items)" -ForegroundColor Green
 
 # -----------------------------------------------------------------------------
@@ -166,16 +188,16 @@ $p2StockInitial = $p2Before.data.stock
 Write-Host "  Current stock of Tomat Merah: $p2StockInitial" -ForegroundColor Gray
 
 # Add 2 pcs of Product 2 to Cart
-Invoke-RestMethod -Uri "$baseUrl/cart/items" -Method Post -Headers @{ Authorization = "Bearer $custToken" } -Body (@{ product_id = 2; quantity = 2 } | ConvertTo-Json) -ContentType "application/json" | Out-Null
+Invoke-RestMethod -Uri "$baseUrl/cart/items" -Method Post -WebSession $custSession -Headers $custHeaders -Body (@{ product_id = 2; quantity = 2 } | ConvertTo-Json) | Out-Null
 
 # Shipping Estimate (100% Delivery Model)
-$estRes = Invoke-RestMethod -Uri "$baseUrl/orders/estimate" -Method Post -Headers @{ Authorization = "Bearer $custToken" } -Body (@{
+$estRes = Invoke-RestMethod -Uri "$baseUrl/orders/estimate" -Method Post -WebSession $custSession -Headers $custHeaders -Body (@{
     shipping_address = "Jl. Kemang Raya No. 10, Jakarta Selatan"
 } | ConvertTo-Json) -ContentType "application/json"
 Write-Host "  [OK] Shipping Estimate: Subtotal = $($estRes.data.subtotal), ShippingFee = $($estRes.data.shipping_fee), Total = $($estRes.data.total_amount)" -ForegroundColor Green
 
 # Checkout Order (using both /orders and /orders/checkout routes)
-$checkoutRes = Invoke-RestMethod -Uri "$baseUrl/orders/checkout" -Method Post -Headers @{ Authorization = "Bearer $custToken" } -Body (@{
+$checkoutRes = Invoke-RestMethod -Uri "$baseUrl/orders/checkout" -Method Post -WebSession $custSession -Headers $custHeaders -Body (@{
     recipient_name = "Budi Santoso"
     recipient_phone = "081987654321"
     shipping_address = "Jl. Kemang Raya No. 45B, Mampang Prapatan, Jakarta Selatan"
@@ -196,20 +218,20 @@ if ($p2StockAfter -eq ($p2StockInitial - 2)) {
 }
 
 # Admin Update Order Status: PENDING_PAYMENT -> PROCESSING
-$procRes = Invoke-RestMethod -Uri "$baseUrl/admin/orders/$orderId/status" -Method Put -Headers @{ Authorization = "Bearer $adminToken" } -Body (@{
+$procRes = Invoke-RestMethod -Uri "$baseUrl/admin/orders/$orderId/status" -Method Put -WebSession $adminSession -Headers $adminHeaders -Body (@{
     status = "PROCESSING"
 } | ConvertTo-Json) -ContentType "application/json"
 Write-Host "  [OK] ADMIN Status Update: $($procRes.data.status)" -ForegroundColor Green
 
 # Admin Update Order Status: PROCESSING -> ON_DELIVERY (with tracking number)
-$deliveryRes = Invoke-RestMethod -Uri "$baseUrl/admin/orders/$orderId/status" -Method Put -Headers @{ Authorization = "Bearer $adminToken" } -Body (@{
+$deliveryRes = Invoke-RestMethod -Uri "$baseUrl/admin/orders/$orderId/status" -Method Put -WebSession $adminSession -Headers $adminHeaders -Body (@{
     status = "ON_DELIVERY"
     tracking_number = "KURIR-SAYUR-9912"
 } | ConvertTo-Json) -ContentType "application/json"
 Write-Host "  [OK] ADMIN Delivery Update: Status = $($deliveryRes.data.status), Resi = $($deliveryRes.data.tracking_number)" -ForegroundColor Green
 
 # Admin CANCEL Order -> Restock Verification
-$cancelRes = Invoke-RestMethod -Uri "$baseUrl/admin/orders/$orderId/status" -Method Put -Headers @{ Authorization = "Bearer $adminToken" } -Body (@{
+$cancelRes = Invoke-RestMethod -Uri "$baseUrl/admin/orders/$orderId/status" -Method Put -WebSession $adminSession -Headers $adminHeaders -Body (@{
     status = "CANCELLED"
 } | ConvertTo-Json) -ContentType "application/json"
 Write-Host "  [OK] ADMIN CANCEL Order: Status = $($cancelRes.data.status)" -ForegroundColor Green

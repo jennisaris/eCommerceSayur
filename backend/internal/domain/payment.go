@@ -31,6 +31,7 @@ func (Payment) TableName() string {
 type PaymentLog struct {
 	ID          int64           `json:"id" gorm:"primaryKey;autoIncrement"`
 	PaymentID   int64           `json:"payment_id" gorm:"column:payment_id;not null;index"`
+	EventKey    string          `json:"-" gorm:"column:event_key;type:varchar(128);index"`
 	Status      string          `json:"status" gorm:"column:status;type:varchar(50);not null"`
 	RawResponse json.RawMessage `json:"raw_response" gorm:"column:raw_response;type:jsonb;not null"`
 	CreatedAt   time.Time       `json:"created_at" gorm:"column:created_at;autoCreateTime"`
@@ -68,9 +69,11 @@ type PaymentRepository interface {
 	GetByGatewayID(ctx context.Context, gatewayID string) (*Payment, error)
 	Update(ctx context.Context, payment *Payment) error
 	CreateLog(ctx context.Context, log *PaymentLog) error
+	GetLogByEventKey(ctx context.Context, eventKey string) (*PaymentLog, error)
 }
 
 type PaymentUseCase interface {
 	CreateSnapTransaction(ctx context.Context, orderCode string, userID int64) (*CreateSnapTransactionResponse, error)
 	HandleMidtransCallback(ctx context.Context, payload []byte) error
+	SyncOrderPaymentStatus(ctx context.Context, orderCode string, userID int64) (*Order, error)
 }

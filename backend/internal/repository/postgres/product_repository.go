@@ -81,8 +81,8 @@ func (r *ProductRepository) GetAll(ctx context.Context, filter domain.ProductFil
 	}
 
 	if filter.Search != "" {
-		searchTerm := "%" + filter.Search + "%"
-		query = query.Where("name ILIKE ? OR description ILIKE ?", searchTerm, searchTerm)
+		searchTerm := escapeLikePattern(filter.Search)
+		query = query.Where(`name ILIKE ? ESCAPE '\' OR description ILIKE ? ESCAPE '\'`, searchTerm, searchTerm)
 	}
 
 	if filter.Status != "" {

@@ -88,13 +88,7 @@ make up
 - **Backend API:** [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
 - **Health Check:** [http://localhost:8080/health](http://localhost:8080/health)
 
-### Akun Uji Coba Default (Seeded):
-| Peran | Email | Password | Akses |
-|---|---|---|---|
-| **Super Admin** | `admin@ecommerce.com` | `Admin123!` | Dashboard Admin ([http://localhost:3000/admin](http://localhost:3000/admin)) |
-| **Customer Demo** | `budi@customer.com` | `Admin123!` | Portal Belanja & Checkout 100% Delivery |
-
-*(Tersedia tombol **Quick Fill Demo** di halaman login untuk kemudahan pengujian).*
+Untuk development lokal, buat akun melalui halaman registrasi atau jalankan seeder secara eksplisit dengan `RUN_SEEDER=true`. Seeder development tidak boleh digunakan pada production.
 
 ---
 
@@ -103,7 +97,11 @@ make up
 ### Autentikasi & Akun
 - `POST /api/v1/auth/register` — Pendaftaran pelanggan baru (otomatis membuat keranjang & role Customer).
 - `POST /api/v1/auth/login` — Login dan penerbitan token JWT.
-- `GET /api/v1/auth/me` — Ambil profil pengguna terautentikasi (Bearer token).
+- `GET /api/v1/auth/csrf` — Inisialisasi token CSRF untuk request mutating.
+- `GET /api/v1/auth/me` — Ambil profil pengguna terautentikasi melalui HttpOnly session cookie.
+- `POST /api/v1/auth/refresh` — Rotasi refresh session dan access cookie.
+- `POST /api/v1/auth/logout` — Revoke refresh session dan hapus cookie.
+- `GET /api/v1/auth/verify-email?token=...` — Verifikasi email pengguna.
 
 ### Katalog & Kategori (Publik & Terakselerasi Redis)
 - `GET /api/v1/categories` — Daftar kategori aktif.

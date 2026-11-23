@@ -16,7 +16,6 @@ export default defineNuxtConfig({
   },
   vite: {
     server: {
-      host: '127.0.0.1',
       strictPort: true,
       hmr: {
         protocol: 'ws',
@@ -34,7 +33,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8080/api/v1',
-      midtransClientKey: process.env.NUXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'SB-Mid-client-TEST-KEY-SAMPLE',
+      midtransClientKey: process.env.NUXT_PUBLIC_MIDTRANS_CLIENT_KEY || '',
       midtransSnapUrl: process.env.NUXT_PUBLIC_MIDTRANS_SNAP_URL || 'https://app.sandbox.midtrans.com/snap/snap.js',
     }
   },

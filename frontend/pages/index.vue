@@ -1,7 +1,8 @@
 <template>
   <div class="space-y-12 pb-16">
     <!-- Hero Slider Section (BookVerse Luxury Library Hero) -->
-    <section class="mt-4">
+    <HeroSlider />
+    <section class="mt-4 hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           class="relative rounded-3xl overflow-hidden bg-cover bg-center shadow-xl border border-slate-800"

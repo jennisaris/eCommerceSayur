@@ -56,10 +56,6 @@
             <img src="/assets/images/payment/paypal.svg" alt="Paypal" class="h-5" />
             <img src="/assets/images/payment/american-express.svg" alt="Amex" class="h-5" />
           </div>
-          <div class="p-2.5 rounded-lg bg-slate-800/80 text-[11px] text-slate-400 font-mono border border-slate-700/40">
-            Demo Super Admin:<br />
-            admin@ecommerce.com / Admin123!
-          </div>
         </div>
       </div>
 

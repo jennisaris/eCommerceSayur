@@ -14,7 +14,6 @@ services:
       - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-ecommerce_db}"]
       interval: 5s
@@ -54,7 +53,7 @@ services:
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     environment:
-      APP_ENV: ${APP_ENV:-production}
+      APP_ENV: ${APP_ENV:-development}
       APP_PORT: 8080
       DB_HOST: postgres
       DB_PORT: 5432
@@ -66,7 +65,11 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-super-secret-ecommerce-jwt-token-key-2026}
-      JWT_EXPIRATION_HOURS: 72
+      JWT_ACCESS_EXPIRATION_MINUTES: 15
+      REFRESH_TOKEN_DAYS: 30
+      COOKIE_SECURE: "false"
+      REQUIRE_EMAIL_VERIFICATION: "false"
+      RUN_SEEDER: ${RUN_SEEDER:-true}
       MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY:-SB-Mid-server-YOUR_SERVER_KEY}
       MIDTRANS_CLIENT_KEY: ${MIDTRANS_CLIENT_KEY:-SB-Mid-client-YOUR_CLIENT_KEY}
       MIDTRANS_IS_PRODUCTION: ${MIDTRANS_IS_PRODUCTION:-false}

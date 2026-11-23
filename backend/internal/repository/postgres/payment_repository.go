@@ -70,3 +70,17 @@ func (r *PaymentRepository) Update(ctx context.Context, payment *domain.Payment)
 func (r *PaymentRepository) CreateLog(ctx context.Context, log *domain.PaymentLog) error {
 	return r.db.WithContext(ctx).Create(log).Error
 }
+
+func (r *PaymentRepository) GetLogByEventKey(ctx context.Context, eventKey string) (*domain.PaymentLog, error) {
+	var paymentLog domain.PaymentLog
+	err := r.db.WithContext(ctx).
+		Where("event_key = ?", eventKey).
+		First(&paymentLog).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrNotFound
+		}
+		return nil, err
+	}
+	return &paymentLog, nil
+}

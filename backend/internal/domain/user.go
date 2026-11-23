@@ -71,23 +71,55 @@ func (VerificationToken) TableName() string {
 	return "verification_tokens"
 }
 
+type AuthSession struct {
+	ID        int64      `json:"-" gorm:"primaryKey;autoIncrement"`
+	UserID    int64      `json:"user_id" gorm:"column:user_id;not null"`
+	TokenHash string     `json:"-" gorm:"column:token_hash;type:varchar(64);unique;not null"`
+	ExpiresAt time.Time  `json:"-" gorm:"column:expires_at;not null"`
+	RevokedAt *time.Time `json:"-" gorm:"column:revoked_at"`
+	CreatedAt time.Time  `json:"-" gorm:"column:created_at;autoCreateTime"`
+}
+
+func (AuthSession) TableName() string {
+	return "auth_sessions"
+}
+
 // DTOs
 type RegisterRequest struct {
 	Name     string `json:"name" validate:"required,min=2,max=100"`
 	Email    string `json:"email" validate:"required,email,max=100"`
-	Password string `json:"password" validate:"required,min=6,max=50"`
-	Phone    string `json:"phone" validate:"omitempty,max=20"`
-	Address  string `json:"address" validate:"omitempty"`
+	Password string `json:"password" validate:"required,min=12,max=72"`
+	Phone    string `json:"phone" validate:"omitempty,phone"`
+	Address  string `json:"address" validate:"omitempty,max=500"`
 }
 
 type LoginRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
+	Email    string `json:"email" validate:"required,email,max=100"`
+	Password string `json:"password" validate:"required,max=72"`
+}
+
+type ForgotPasswordRequest struct {
+	Email string `json:"email" validate:"required,email,max=100"`
+}
+
+type ResetPasswordRequest struct {
+	Token       string `json:"token" validate:"required,min=16,max=256"`
+	NewPassword string `json:"new_password" validate:"required,min=12,max=72"`
+}
+
+type UpdateProfileRequest struct {
+	Name            string `json:"name" validate:"required,min=2,max=100"`
+	Email           string `json:"email" validate:"required,email,max=100"`
+	Phone           string `json:"phone" validate:"omitempty,phone"`
+	Address         string `json:"address" validate:"omitempty,max=500"`
+	CurrentPassword string `json:"current_password" validate:"omitempty,max=72"`
 }
 
 type AuthResponse struct {
-	Token string `json:"token"`
-	User  *User  `json:"user"`
+	Token                string `json:"-"`
+	RefreshToken         string `json:"-"`
+	User                 *User  `json:"user"`
+	VerificationRequired bool   `json:"verification_required,omitempty"`
 }
 
 type UserRepository interface {
@@ -99,11 +131,21 @@ type UserRepository interface {
 	CreateVerificationToken(ctx context.Context, token *VerificationToken) error
 	GetVerificationToken(ctx context.Context, token string, tokenType string) (*VerificationToken, error)
 	DeleteVerificationToken(ctx context.Context, id int64) error
+	DeleteVerificationTokensByUser(ctx context.Context, userID int64, tokenType string) error
+	CreateAuthSession(ctx context.Context, session *AuthSession) error
+	GetActiveAuthSession(ctx context.Context, tokenHash string) (*AuthSession, error)
+	RevokeAuthSession(ctx context.Context, tokenHash string) error
+	RevokeAllUserSessions(ctx context.Context, userID int64) error
 }
 
 type AuthUseCase interface {
 	Register(ctx context.Context, req *RegisterRequest) (*AuthResponse, error)
 	Login(ctx context.Context, req *LoginRequest) (*AuthResponse, error)
+	Refresh(ctx context.Context, refreshToken string) (*AuthResponse, error)
+	Logout(ctx context.Context, refreshToken string) error
 	GetProfile(ctx context.Context, userID int64) (*User, error)
+	UpdateProfile(ctx context.Context, userID int64, req *UpdateProfileRequest) (*User, bool, error)
 	VerifyEmail(ctx context.Context, token string) error
+	RequestPasswordReset(ctx context.Context, email string) error
+	ResetPassword(ctx context.Context, token string, newPassword string) error
 }

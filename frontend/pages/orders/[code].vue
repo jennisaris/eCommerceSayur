@@ -52,7 +52,7 @@
           <div>
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Informasi Pembayaran</h3>
             <p class="text-xs text-slate-600">
-              Metode: <strong class="text-slate-800">{{ order.payment?.payment_method || 'Midtrans Snap' }}</strong>
+              Metode: <strong class="text-slate-800">{{ formatPaymentMethod(order.payment?.payment_method) }}</strong>
             </p>
             <p class="text-xs text-slate-600 mt-1">
               Status Midtrans: <strong class="text-slate-800 uppercase">{{ order.payment?.payment_status || 'PENDING' }}</strong>
@@ -149,7 +149,21 @@ const fetchOrder = async () => {
   isLoading.value = true
   try {
     const res = await api.get<Order>(`/orders/${code}`)
-    if (res.data) order.value = res.data
+    if (res.data) {
+      order.value = res.data
+      if (order.value.status === 'PENDING_PAYMENT') {
+        try {
+          const syncRes = await api.post<Order>('/payments/sync', {
+            order_code: order.value.order_code,
+          })
+          if (syncRes.data) {
+            order.value = syncRes.data
+          }
+        } catch {
+          // Keep current order state if Midtrans status sync is temporarily unavailable
+        }
+      }
+    }
   } catch (err) {
     console.error('Failed to load order invoice:', err)
   } finally {
@@ -182,7 +196,7 @@ const handlePayNow = async () => {
           fetchOrder()
         },
       })
-    } else if (snapRes.data?.redirect_url) {
+    } else if (snapRes.data?.redirect_url && isAllowedMidtransUrl(snapRes.data.redirect_url)) {
       window.location.href = snapRes.data.redirect_url
     }
   } catch (err: any) {
@@ -226,6 +240,27 @@ const formatStatus = (status: string) => {
     default:
       return status
   }
+}
+
+const formatPaymentMethod = (method?: string) => {
+  const key = String(method || '').trim().toLowerCase()
+  if (!key) return 'Midtrans Snap'
+  const labels: Record<string, string> = {
+    bank_transfer: 'Bank Transfer',
+    credit_card: 'Credit Card',
+    qris: 'QRIS',
+    gopay: 'GoPay',
+    shopeepay: 'ShopeePay',
+    echannel: 'Mandiri Bill',
+    cstore: 'Gerai Retail',
+    bca_klikpay: 'BCA KlikPay',
+    akulaku: 'Akulaku',
+    kredivo: 'Kredivo',
+  }
+  if (labels[key]) return labels[key]
+  return key
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (ch) => ch.toUpperCase())
 }
 
 const formatIDR = (val: number) => {

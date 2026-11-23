@@ -18,6 +18,18 @@ const (
 	OrderStatusCancelled      OrderStatus = "CANCELLED"
 )
 
+// CalculateShippingFee computes dynamic delivery fee based on weight in grams (100% Delivery Model).
+// Base fee: Rp 15.000 for first 1,000 grams, Rp 8.000 per additional kg (ceiling).
+func CalculateShippingFee(totalWeightGrams int) int64 {
+	baseFee := int64(15000)
+	if totalWeightGrams <= 1000 {
+		return baseFee
+	}
+	excessGrams := totalWeightGrams - 1000
+	additionalKg := (excessGrams + 999) / 1000
+	return baseFee + (int64(additionalKg) * 8000)
+}
+
 type Order struct {
 	ID              int64          `json:"id" gorm:"primaryKey;autoIncrement"`
 	OrderCode       string         `json:"order_code" gorm:"column:order_code;type:varchar(60);unique;not null;index"`
@@ -65,17 +77,17 @@ func (OrderItem) TableName() string {
 // 100% Delivery Checkout DTO: Recipient Name, Phone, Address, Shipping Fee are mandatory
 type CheckoutRequest struct {
 	RecipientName   string `json:"recipient_name" validate:"required,min=2,max=100"`
-	RecipientPhone  string `json:"recipient_phone" validate:"required,min=8,max=25"`
-	ShippingAddress string `json:"shipping_address" validate:"required,min=5"`
-	ShippingLat     string `json:"shipping_lat"`
-	ShippingLng     string `json:"shipping_lng"`
-	Remarks         string `json:"remarks"`
+	RecipientPhone  string `json:"recipient_phone" validate:"required,phone"`
+	ShippingAddress string `json:"shipping_address" validate:"required,min=5,max=500"`
+	ShippingLat     string `json:"shipping_lat" validate:"omitempty,max=50,latitude"`
+	ShippingLng     string `json:"shipping_lng" validate:"omitempty,max=50,longitude"`
+	Remarks         string `json:"remarks" validate:"omitempty,max=255"`
 }
 
 type CheckoutEstimateRequest struct {
-	ShippingAddress string `json:"shipping_address"`
-	ShippingLat     string `json:"shipping_lat"`
-	ShippingLng     string `json:"shipping_lng"`
+	ShippingAddress string `json:"shipping_address" validate:"omitempty,max=500"`
+	ShippingLat     string `json:"shipping_lat" validate:"omitempty,max=50,latitude"`
+	ShippingLng     string `json:"shipping_lng" validate:"omitempty,max=50,longitude"`
 }
 
 type CheckoutEstimateResponse struct {
@@ -87,7 +99,7 @@ type CheckoutEstimateResponse struct {
 
 type UpdateOrderStatusRequest struct {
 	Status         string `json:"status" validate:"required,oneof=PROCESSING ON_DELIVERY COMPLETED CANCELLED"`
-	TrackingNumber string `json:"tracking_number"`
+	TrackingNumber string `json:"tracking_number" validate:"omitempty,max=100"`
 }
 
 type OrderFilter struct {
@@ -111,7 +123,7 @@ type OrderRepository interface {
 type OrderUseCase interface {
 	EstimateCheckout(ctx context.Context, userID int64, req *CheckoutEstimateRequest) (*CheckoutEstimateResponse, error)
 	CreateOrder(ctx context.Context, userID int64, req *CheckoutRequest) (*Order, error)
-	GetOrderByCode(ctx context.Context, userID int64, code string, isAdmin bool) (*Order, error)
+	GetOrderByCode(ctx context.Context, userID int64, code string) (*Order, error)
 	GetUserOrders(ctx context.Context, userID int64, filter OrderFilter) ([]Order, int64, error)
 	AdminGetAllOrders(ctx context.Context, filter OrderFilter) ([]Order, int64, error)
 	AdminUpdateOrderStatus(ctx context.Context, orderID int64, req *UpdateOrderStatusRequest) (*Order, error)

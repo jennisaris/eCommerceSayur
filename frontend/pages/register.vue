@@ -61,8 +61,10 @@
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
                 required
-                minlength="6"
-                placeholder="Minimal 6 karakter"
+                minlength="12"
+                maxlength="72"
+                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{12,72}"
+                placeholder="Min. 12 karakter, kombinasi huruf, angka, simbol"
                 class="w-full pl-9 pr-9 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 transition-all"
               />
               <i class="ti ti-lock text-gray-400 absolute left-3 top-3 text-sm"></i>
@@ -140,7 +142,11 @@ const handleRegister = async () => {
   isLoading.value = true
   errorMessage.value = ''
   try {
-    await authStore.register(form)
+    const result = await authStore.register(form)
+    if (result.verification_required) {
+      router.push('/login?verification=pending')
+      return
+    }
     router.push('/')
   } catch (err: any) {
     errorMessage.value = err.message || 'Pendaftaran gagal. Pastikan email belum terdaftar.'

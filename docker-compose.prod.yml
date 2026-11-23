@@ -6,16 +6,15 @@ services:
     container_name: ecommerce_postgres_prod
     restart: always
     environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_USER: ${DB_USER:?DB_USER must be provided and must be least-privilege}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?Database password must be provided}
       POSTGRES_DB: ${DB_NAME:-ecommerce_db}
       TZ: Asia/Jakarta
     # Note: Ports are NOT mapped to the host for production security
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
-      - ./backend/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-ecommerce_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:?DB_USER must be provided} -d ${DB_NAME:-ecommerce_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,20 +59,28 @@ services:
       APP_PORT: 8080
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_USER: ${DB_USER:-postgres}
+      DB_USER: ${DB_USER:?DB_USER must be provided and must be least-privilege}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME:-ecommerce_db}
-      DB_SSLMODE: ${DB_SSLMODE:-disable}
+      DB_SSLMODE: ${DB_SSLMODE:-require}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be provided}
-      JWT_EXPIRATION_HOURS: ${JWT_EXPIRATION_HOURS:-72}
+      JWT_ACCESS_EXPIRATION_MINUTES: ${JWT_ACCESS_EXPIRATION_MINUTES:-15}
+      REFRESH_TOKEN_DAYS: ${REFRESH_TOKEN_DAYS:-30}
+      COOKIE_SECURE: "true"
+      REQUIRE_EMAIL_VERIFICATION: "true"
+      SMTP_HOST: ${SMTP_HOST:?SMTP_HOST must be provided}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:?SMTP_USERNAME must be provided}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:?SMTP_PASSWORD must be provided}
+      SMTP_FROM: ${SMTP_FROM:?SMTP_FROM must be provided}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://yourdomain.com}
       CLIENT_BASE_URL: ${CLIENT_BASE_URL:-https://yourdomain.com}
-      RUN_SEEDER: ${RUN_SEEDER:-false}
-      MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY:-SB-Mid-server-TEST-KEY-SAMPLE}
-      MIDTRANS_CLIENT_KEY: ${MIDTRANS_CLIENT_KEY:-SB-Mid-client-TEST-KEY-SAMPLE}
+      RUN_SEEDER: "false"
+      MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY:?MIDTRANS_SERVER_KEY must be provided}
+      MIDTRANS_CLIENT_KEY: ${MIDTRANS_CLIENT_KEY:?MIDTRANS_CLIENT_KEY must be provided}
       MIDTRANS_IS_PRODUCTION: ${MIDTRANS_IS_PRODUCTION:-false}
     networks:
       - ecommerce_internal
@@ -91,7 +98,7 @@ services:
       PORT: 3000
       HOST: 0.0.0.0
       NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-/api/v1}
-      NUXT_PUBLIC_MIDTRANS_CLIENT_KEY: ${MIDTRANS_CLIENT_KEY:-SB-Mid-client-TEST-KEY-SAMPLE}
+      NUXT_PUBLIC_MIDTRANS_CLIENT_KEY: ${MIDTRANS_CLIENT_KEY:?MIDTRANS_CLIENT_KEY must be provided}
       NUXT_PUBLIC_MIDTRANS_SNAP_URL: ${NUXT_PUBLIC_MIDTRANS_SNAP_URL:-https://app.sandbox.midtrans.com/snap/snap.js}
     networks:
       - ecommerce_internal

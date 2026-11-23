@@ -89,8 +89,18 @@
           </button>
 
           <!-- User Menu / Auth Buttons -->
-          <div v-if="authStore.isAuthenticated" class="relative group">
-            <button class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-100 transition-colors">
+          <div
+            v-if="authStore.isAuthenticated"
+            ref="userMenuRef"
+            class="relative"
+          >
+            <button
+              type="button"
+              @click.stop="isUserMenuOpen = !isUserMenuOpen"
+              :aria-expanded="isUserMenuOpen"
+              aria-haspopup="menu"
+              class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+            >
               <img
                 :src="authStore.user?.photo || '/assets/images/avatar/avatar-1.jpg'"
                 alt="Avatar"
@@ -99,19 +109,44 @@
               <span class="hidden md:inline-block text-xs font-semibold text-slate-700 max-w-[120px] truncate">
                 {{ authStore.user?.name }}
               </span>
+              <svg
+                class="w-3.5 h-3.5 text-slate-500 transition-transform"
+                :class="{ 'rotate-180': isUserMenuOpen }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
             </button>
-            <!-- Dropdown -->
-            <div class="absolute right-0 mt-1 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl py-1.5 hidden group-hover:block transition-all z-50">
+            <!-- Dropdown (click-to-open so menu never disappears while moving cursor) -->
+            <div
+              v-if="isUserMenuOpen"
+              @click.stop
+              class="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-1.5 z-[60]"
+            >
               <div class="px-4 py-2 border-b border-slate-100">
                 <p class="text-xs font-bold text-slate-900 truncate">{{ authStore.user?.name }}</p>
                 <p class="text-[11px] text-slate-500 truncate">{{ authStore.user?.email }}</p>
               </div>
-              <NuxtLink to="/orders" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+              <NuxtLink
+                to="/profile"
+                @click="isUserMenuOpen = false"
+                class="block px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium"
+              >
+                Profil Saya
+              </NuxtLink>
+              <NuxtLink
+                to="/orders"
+                @click="isUserMenuOpen = false"
+                class="block px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium"
+              >
                 Riwayat Pesanan Buku
               </NuxtLink>
               <button
-                @click="authStore.logout"
-                class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 font-semibold"
+                type="button"
+                @click="handleLogout"
+                class="w-full text-left px-4 py-2.5 text-xs text-rose-600 hover:bg-rose-50 font-semibold"
               >
                 Keluar (Logout)
               </button>
@@ -143,6 +178,25 @@ const authStore = useAuthStore()
 const cartStore = useCartStore()
 const router = useRouter()
 const searchQuery = ref('')
+const isUserMenuOpen = ref(false)
+const userMenuRef = ref<HTMLElement | null>(null)
+
+const handleDocumentClick = (event: MouseEvent) => {
+  if (userMenuRef.value && !userMenuRef.value.contains(event.target as Node)) {
+    isUserMenuOpen.value = false
+  }
+}
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    isUserMenuOpen.value = false
+  }
+}
+
+const handleLogout = async () => {
+  isUserMenuOpen.value = false
+  await authStore.logout()
+}
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
@@ -154,8 +208,15 @@ const handleSearch = () => {
 }
 
 onMounted(() => {
+  document.addEventListener('click', handleDocumentClick)
+  document.addEventListener('keydown', handleKeydown)
   if (authStore.isAuthenticated) {
     cartStore.fetchCart()
   }
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleDocumentClick)
+  document.removeEventListener('keydown', handleKeydown)
 })
 </script>

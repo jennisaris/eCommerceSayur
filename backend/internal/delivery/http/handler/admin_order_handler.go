@@ -3,8 +3,10 @@ package handler
 import (
 	"ecommerce-backend/internal/domain"
 	"ecommerce-backend/internal/pkg/response"
+	pkgvalidate "ecommerce-backend/internal/pkg/validate"
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -18,15 +20,20 @@ type AdminOrderHandler struct {
 func NewAdminOrderHandler(orderUseCase domain.OrderUseCase) *AdminOrderHandler {
 	return &AdminOrderHandler{
 		orderUseCase: orderUseCase,
-		validate:     validator.New(),
+		validate:     pkgvalidate.New(),
 	}
 }
 
 func (h *AdminOrderHandler) GetAllOrders(c *fiber.Ctx) error {
-	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", "20"))
-	status := c.Query("status", "")
-	search := c.Query("search", "")
+	page, limit := parsePagination(c)
+	status := strings.TrimSpace(c.Query("status", ""))
+	if !isValidOrderStatusFilter(status) {
+		return response.Error(c, fiber.StatusBadRequest, "Invalid order status filter")
+	}
+	search := strings.TrimSpace(c.Query("search", ""))
+	if len(search) > 100 {
+		search = search[:100]
+	}
 
 	filter := domain.OrderFilter{
 		Status: status,
@@ -37,7 +44,7 @@ func (h *AdminOrderHandler) GetAllOrders(c *fiber.Ctx) error {
 
 	orders, total, err := h.orderUseCase.AdminGetAllOrders(c.Context(), filter)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, err.Error())
+		return response.Internal(c, err)
 	}
 
 	return response.Paginated(c, "All orders retrieved successfully", orders, page, limit, total)
@@ -45,7 +52,7 @@ func (h *AdminOrderHandler) GetAllOrders(c *fiber.Ctx) error {
 
 func (h *AdminOrderHandler) UpdateOrderStatus(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
-	if err != nil {
+	if err != nil || id <= 0 {
 		return response.Error(c, fiber.StatusBadRequest, "Invalid order ID")
 	}
 
@@ -55,7 +62,7 @@ func (h *AdminOrderHandler) UpdateOrderStatus(c *fiber.Ctx) error {
 	}
 
 	if err := h.validate.Struct(&req); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, err.Error())
+		return response.Error(c, fiber.StatusBadRequest, pkgvalidate.FormatError(err))
 	}
 
 	order, err := h.orderUseCase.AdminUpdateOrderStatus(c.Context(), id, &req)
@@ -63,7 +70,7 @@ func (h *AdminOrderHandler) UpdateOrderStatus(c *fiber.Ctx) error {
 		if errors.Is(err, domain.ErrNotFound) {
 			return response.Error(c, fiber.StatusNotFound, "Order not found")
 		}
-		return response.Error(c, fiber.StatusInternalServerError, err.Error())
+		return response.Internal(c, err)
 	}
 
 	return response.Success(c, "Order status updated successfully", order)

@@ -2,43 +2,25 @@ import { defineStore } from 'pinia'
 import type { User } from '~/types'
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(null)
   const user = ref<User | null>(null)
-  const isAuthenticated = computed(() => !!token.value)
+  const initialized = ref(false)
+  const isAuthenticated = computed(() => !!user.value)
   const isSuperAdmin = computed(() => {
     return user.value?.roles?.some((r) => r.name === 'Super Admin') ?? false
   })
 
-  // Initialize from localStorage in client
-  if (process.client) {
-    const savedToken = localStorage.getItem('auth_token')
-    if (savedToken) {
-      token.value = savedToken
-      const savedUser = localStorage.getItem('auth_user')
-      if (savedUser) {
-        try {
-          user.value = JSON.parse(savedUser)
-        } catch {}
-      }
-    }
-  }
-
-  const setAuth = (newToken: string, newUser: User) => {
-    token.value = newToken
+  const setUser = (newUser: User) => {
     user.value = newUser
-    if (process.client) {
-      localStorage.setItem('auth_token', newToken)
-      localStorage.setItem('auth_user', JSON.stringify(newUser))
-    }
   }
 
   const login = async (email: string, password: string) => {
     const api = useApi()
-    const res = await api.post<{ token: string; user: User }>('/auth/login', {
+    const res = await api.post<{ user: User }>('/auth/login', {
       email,
       password,
     })
-    setAuth(res.data.token, res.data.user)
+    setUser(res.data.user)
+    initialized.value = true
     return res.data
   }
 
@@ -50,46 +32,68 @@ export const useAuthStore = defineStore('auth', () => {
     address?: string
   }) => {
     const api = useApi()
-    const res = await api.post<{ token: string; user: User }>('/auth/register', payload)
-    setAuth(res.data.token, res.data.user)
+    const res = await api.post<{ user: User; verification_required?: boolean }>('/auth/register', payload)
+    if (!res.data.verification_required) {
+      setUser(res.data.user)
+      initialized.value = true
+    }
     return res.data
   }
 
   const fetchProfile = async () => {
-    if (!token.value) return null
+    if (initialized.value) return user.value
+    initialized.value = true
     const api = useApi()
     try {
       const res = await api.get<User>('/auth/me')
-      user.value = res.data
-      if (process.client) {
-        localStorage.setItem('auth_user', JSON.stringify(res.data))
-      }
+      setUser(res.data)
       return res.data
     } catch {
-      logout()
+      user.value = null
       return null
     }
   }
 
-  const logout = () => {
-    token.value = null
+  const updateProfile = async (payload: {
+    name: string
+    email: string
+    phone?: string
+    address?: string
+    current_password?: string
+  }) => {
+    const api = useApi()
+    const res = await api.put<User>('/auth/me', payload)
+    setUser(res.data)
+    return res
+  }
+
+  const clearSession = () => {
     user.value = null
-    if (process.client) {
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('auth_user')
+    initialized.value = true
+  }
+
+  const logout = async (redirect = true) => {
+    const api = useApi()
+    try {
+      await api.post('/auth/logout')
+    } catch {
+      // Clear client state even if the server session is already unavailable.
     }
+    clearSession()
+    if (!redirect) return
     const router = useRouter()
     router.push('/login')
   }
 
   return {
-    token,
     user,
     isAuthenticated,
     isSuperAdmin,
     login,
     register,
     fetchProfile,
+    updateProfile,
+    clearSession,
     logout,
   }
 })

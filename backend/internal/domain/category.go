@@ -27,21 +27,21 @@ func (Category) TableName() string {
 }
 
 type CreateCategoryRequest struct {
-	ParentID    *int   `json:"parent_id"`
+	ParentID    *int   `json:"parent_id" validate:"omitempty,gt=0"`
 	Name        string `json:"name" validate:"required,min=2,max=100"`
-	Slug        string `json:"slug" validate:"required,min=2,max=120"`
-	Icon        string `json:"icon"`
+	Slug        string `json:"slug" validate:"required,min=2,max=120,slug"`
+	Icon        string `json:"icon" validate:"omitempty,max=255,safe_url"`
 	Status      *bool  `json:"status"`
-	Description string `json:"description"`
+	Description string `json:"description" validate:"omitempty,max=2000"`
 }
 
 type UpdateCategoryRequest struct {
-	ParentID    *int   `json:"parent_id"`
+	ParentID    *int   `json:"parent_id" validate:"omitempty,gt=0"`
 	Name        string `json:"name" validate:"omitempty,min=2,max=100"`
-	Slug        string `json:"slug" validate:"omitempty,min=2,max=120"`
-	Icon        string `json:"icon"`
+	Slug        string `json:"slug" validate:"omitempty,min=2,max=120,slug"`
+	Icon        string `json:"icon" validate:"omitempty,max=255,safe_url"`
 	Status      *bool  `json:"status"`
-	Description string `json:"description"`
+	Description string `json:"description" validate:"omitempty,max=2000"`
 }
 
 type CategoryRepository interface {

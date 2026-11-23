@@ -1,3 +1,5 @@
+import { isAllowedMidtransUrl } from '~/utils/safeUrl'
+
 declare global {
   interface Window {
     snap?: {
@@ -17,9 +19,14 @@ declare global {
 export default defineNuxtPlugin(() => {
   if (process.client) {
     const config = useRuntimeConfig()
+    const clientKey = String(config.public.midtransClientKey || '').trim()
+    const snapUrl = String(config.public.midtransSnapUrl || '').trim()
+    if (!clientKey || !isAllowedMidtransUrl(snapUrl)) {
+      return
+    }
     const script = document.createElement('script')
-    script.src = config.public.midtransSnapUrl as string
-    script.setAttribute('data-client-key', config.public.midtransClientKey as string)
+    script.src = snapUrl
+    script.setAttribute('data-client-key', clientKey)
     script.async = true
     document.head.appendChild(script)
   }

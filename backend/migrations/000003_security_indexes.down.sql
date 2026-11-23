@@ -1,0 +1,12 @@
+DROP INDEX IF EXISTS uq_payments_gateway_id_nonempty;
+DROP INDEX IF EXISTS idx_payments_order_created_at;
+DROP INDEX IF EXISTS idx_orders_status_created_at;
+DROP INDEX IF EXISTS idx_orders_buyer_created_at;
+DROP INDEX IF EXISTS idx_products_status_category_created_at;
+DROP INDEX IF EXISTS idx_payments_user_id;
+DROP INDEX IF EXISTS idx_order_items_product_id;
+DROP INDEX IF EXISTS idx_cart_items_product_id;
+DROP INDEX IF EXISTS idx_products_parent_id;
+DROP INDEX IF EXISTS idx_categories_parent_id;
+DROP INDEX IF EXISTS idx_verification_tokens_user_id;
+DROP INDEX IF EXISTS idx_user_roles_role_id;

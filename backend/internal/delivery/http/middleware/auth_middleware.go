@@ -11,16 +11,19 @@ import (
 func AuthMiddleware(jwtSvc *jwt.JWTService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
-		if authHeader == "" {
-			return response.Error(c, fiber.StatusUnauthorized, "Missing Authorization header")
+		tokenString := c.Cookies("access_token")
+		if tokenString == "" && authHeader != "" {
+			parts := strings.SplitN(authHeader, " ", 2)
+			if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+				return response.Error(c, fiber.StatusUnauthorized, "Invalid token format")
+			}
+			tokenString = parts[1]
+		}
+		if tokenString == "" {
+			return response.Error(c, fiber.StatusUnauthorized, "Authentication required")
 		}
 
-		parts := strings.SplitN(authHeader, " ", 2)
-		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			return response.Error(c, fiber.StatusUnauthorized, "Invalid token format. Expected 'Bearer <token>'")
-		}
-
-		claims, err := jwtSvc.ValidateToken(parts[1])
+		claims, err := jwtSvc.ValidateToken(tokenString)
 		if err != nil {
 			return response.Error(c, fiber.StatusUnauthorized, "Invalid or expired token")
 		}

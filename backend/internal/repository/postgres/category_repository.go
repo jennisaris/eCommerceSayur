@@ -52,9 +52,11 @@ func (r *CategoryRepository) GetBySlug(ctx context.Context, slug string) (*domai
 
 func (r *CategoryRepository) GetAll(ctx context.Context, onlyActive bool) ([]domain.Category, error) {
 	var categories []domain.Category
-	query := r.db.WithContext(ctx).Preload("Children").Where("parent_id IS NULL")
+	query := r.db.WithContext(ctx).Where("parent_id IS NULL")
 	if onlyActive {
-		query = query.Where("status = ?", true)
+		query = query.Preload("Children", "status = ?", true).Where("status = ?", true)
+	} else {
+		query = query.Preload("Children")
 	}
 
 	err := query.Order("id ASC").Find(&categories).Error

@@ -36,5 +36,18 @@
 
 <script setup lang="ts">
 const route = useRoute()
+const api = useApi()
+const authStore = useAuthStore()
 const orderCode = computed(() => (route.query.order_code as string) || '')
+
+onMounted(async () => {
+  await authStore.fetchProfile()
+  if (orderCode.value && authStore.isAuthenticated) {
+    try {
+      await api.post('/payments/sync', { order_code: orderCode.value })
+    } catch {
+      // Ignore sync error; user can check status on order detail page
+    }
+  }
+})
 </script>

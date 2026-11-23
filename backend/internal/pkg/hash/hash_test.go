@@ -3,6 +3,8 @@ package hash_test
 import (
 	"ecommerce-backend/internal/pkg/hash"
 	"testing"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestHashPassword_And_CheckPassword(t *testing.T) {
@@ -15,6 +17,14 @@ func TestHashPassword_And_CheckPassword(t *testing.T) {
 
 	if hashed == plainPassword {
 		t.Fatal("hashed password must not match plain text")
+	}
+
+	cost, err := bcrypt.Cost([]byte(hashed))
+	if err != nil {
+		t.Fatalf("failed reading bcrypt cost: %v", err)
+	}
+	if cost != hash.BcryptCost {
+		t.Fatalf("expected bcrypt cost %d, got %d", hash.BcryptCost, cost)
 	}
 
 	// Correct password check

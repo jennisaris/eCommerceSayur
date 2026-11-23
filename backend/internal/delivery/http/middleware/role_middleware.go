@@ -1,29 +1,27 @@
 package middleware
 
 import (
+	"ecommerce-backend/internal/domain"
 	"ecommerce-backend/internal/pkg/response"
+	"ecommerce-backend/internal/pkg/seclog"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func RequireRole(requiredRole string) fiber.Handler {
+func RequireRole(requiredRole string, userRepo domain.UserRepository) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		rolesVal := c.Locals("roles")
-		if rolesVal == nil {
-			return response.Error(c, fiber.StatusForbidden, "Access forbidden: no roles found")
+		userID, ok := c.Locals("user_id").(int64)
+		if !ok || userID == 0 {
+			seclog.RecordAccessDenied(c.IP(), 0, c.Method(), c.Path(), "unauthenticated_admin_access")
+			return response.Error(c, fiber.StatusUnauthorized, "Unauthorized")
 		}
 
-		roles, ok := rolesVal.([]string)
-		if !ok {
-			return response.Error(c, fiber.StatusForbidden, "Access forbidden: invalid role format")
+		user, err := userRepo.GetByID(c.Context(), userID)
+		if err != nil || user == nil || !user.HasRole(requiredRole) {
+			seclog.RecordAccessDenied(c.IP(), userID, c.Method(), c.Path(), "missing_required_role:"+requiredRole)
+			return response.Error(c, fiber.StatusForbidden, "Access forbidden")
 		}
 
-		for _, r := range roles {
-			if r == requiredRole {
-				return c.Next()
-			}
-		}
-
-		return response.Error(c, fiber.StatusForbidden, "Access forbidden: required role '"+requiredRole+"' not met")
+		return c.Next()
 	}
 }
